@@ -17,6 +17,10 @@
 
 
 
+  
+  
+  <link rel="stylesheet" media="all" href="/lib/Han/dist/han.min.css?v=3.3">
+
 
 
 
@@ -82,7 +86,7 @@
 <meta name="description" content="好好学习 天天向上">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Durow&#39;s corner">
-<meta property="og:url" content="http://yoursite.com/index.html">
+<meta property="og:url" content="http://durow.vip/index.html">
 <meta property="og:site_name" content="Durow&#39;s corner">
 <meta property="og:description" content="好好学习 天天向上">
 <meta property="og:locale" content="zh-Hans">
@@ -98,7 +102,7 @@
     root: '/',
     scheme: 'Gemini',
     version: '5.1.4',
-    sidebar: {"position":"right","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    sidebar: {"position":"right","display":"always","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
     fancybox: true,
     tabs: true,
     motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
@@ -118,7 +122,7 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/"/>
+  <link rel="canonical" href="http://durow.vip/"/>
 
 
 
@@ -241,9 +245,39 @@
       
 
       
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
     </ul>
   
 
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'jv23s59-xwQTfQjP6xPi','2.0.0');
+</script>
+
+
+
+    </div>
   
 </nav>
 
@@ -272,7 +306,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/20/start/">
+    <link itemprop="mainEntityOfPage" href="http://durow.vip/2018/03/20/start/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="durow">
@@ -368,7 +402,7 @@
     
     
     
-    <div class="post-body" itemprop="articleBody">
+    <div class="post-body han-init-context" itemprop="articleBody">
 
       
       
@@ -424,7 +458,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/17/hello-world/">
+    <link itemprop="mainEntityOfPage" href="http://durow.vip/2018/03/17/hello-world/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="durow">
@@ -520,7 +554,7 @@
     
     
     
-    <div class="post-body" itemprop="articleBody">
+    <div class="post-body han-init-context" itemprop="articleBody">
 
       
       
@@ -581,7 +615,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/11/30/在ASP-NET-Core中使用百度在线编辑器UEditor/">
+    <link itemprop="mainEntityOfPage" href="http://durow.vip/2016/11/30/在ASP-NET-Core中使用百度在线编辑器UEditor/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="durow">
@@ -677,14 +711,14 @@
     
     
     
-    <div class="post-body" itemprop="articleBody">
+    <div class="post-body han-init-context" itemprop="articleBody">
 
       
       
 
       
         
-          <h2 id="0x00-起因"><a href="#0x00-起因" class="headerlink" title="0x00 起因"></a>0x00 起因</h2><p>最近需要一个在线编辑器，之前听人说过百度的UEditor不错，去官网下了一个。不过服务端只有ASP.NET版的，如果是为了能尽快使用，只要把ASP.NET版的服务端作为应用部署在IIS上就可以立即使用了。不过我的需求并不急，所以把ASP.NET移植到了ASP.NET Core上。整个过程很简单，只是重新引用了一些包，修改了几处代码，另外就是把Controller中比较长的一个switch语句块重构为了字典，根据url中的action参数从字典中找出并调用相应的Action处理，这样的好处就是如果要扩展action支持的操作无需修改源代码，只要扩展字典就可以，对扩展开放，对修改关闭。最后把服务端功能打成了nuget包UEditorNetCore，方便使用。这篇博客主要就介绍下如何使用UEditorNetCore快速实现UEditor服务端，也可以直接使用源代码中的示例，希望对有这方面需求的园友有所帮助。</p>
+          <p><img src="/images/2016/1130/201611300000.png" alt="UEditor"></p>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2016/11/30/在ASP-NET-Core中使用百度在线编辑器UEditor/#more" rel="contents">
@@ -811,9 +845,9 @@
             <div class="links-of-author motion-element">
                 
                   <span class="links-of-author-item">
-                    <a href="https://github.com/durow" target="_blank" title="GitHub">
+                    <a href="http://www.qq.com" target="_blank" title="16141860">
                       
-                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                        <i class="fa fa-fw fa-qq"></i>16141860</a>
                   </span>
                 
                   <span class="links-of-author-item">
@@ -823,9 +857,9 @@
                   </span>
                 
                   <span class="links-of-author-item">
-                    <a href="https://twitter.com/durow1984" target="_blank" title="Twitter">
+                    <a href="https://github.com/durow" target="_blank" title="GitHub">
                       
-                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
                   </span>
                 
                   <span class="links-of-author-item">
@@ -841,6 +875,20 @@
           
 
           
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-heart"></i>
+                好站推荐
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://cnblogs.com/" title="博客园" target="_blank">博客园</a>
+                  </li>
+                
+              </ul>
+            </div>
           
 
           
@@ -871,10 +919,19 @@
       <div class="footer-inner">
         <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
   <span class="with-love">
-    <i class="fa fa-user"></i>
+    <i class="fa fa-heart"></i>
   </span>
   <span class="author" itemprop="copyrightHolder">durow</span>
 
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count"></span>
   
 </div>
 
@@ -1151,6 +1208,31 @@
   
 
   
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "default";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "middleRight";
+      
+          pbOptions.networks = "Wechat,Weibo,Douban,QQZone,Evernote,Twitter";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+  </script>
+
   
 
   
