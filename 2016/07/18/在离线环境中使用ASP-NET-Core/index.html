@@ -72,7 +72,7 @@
 
 
 
-  <meta name="keywords" content="ASP.NET Core," />
+  <meta name="keywords" content="ASP.NET Core,离线环境," />
 
 
 
@@ -83,18 +83,21 @@
 
 
 
-<meta name="description" content="热爱生活 热爱学习">
-<meta name="keywords" content="ASP.NET Core">
+<meta name="description" content="0x00 写在开始">
+<meta name="keywords" content="ASP.NET Core,离线环境">
 <meta property="og:type" content="article">
 <meta property="og:title" content="在离线环境中使用ASP.NET Core">
 <meta property="og:url" content="http://durow.vip/2016/07/18/在离线环境中使用ASP-NET-Core/index.html">
 <meta property="og:site_name" content="Durow&#39;s corner">
-<meta property="og:description" content="热爱生活 热爱学习">
+<meta property="og:description" content="0x00 写在开始">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-03-21T02:36:24.876Z">
+<meta property="og:image" content="http://durow.vip/images/2016/0718/201607180101.png">
+<meta property="og:image" content="http://durow.vip/images/2016/0718/201607180301.png">
+<meta property="og:updated_time" content="2018-03-21T08:18:30.853Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="在离线环境中使用ASP.NET Core">
-<meta name="twitter:description" content="热爱生活 热爱学习">
+<meta name="twitter:description" content="0x00 写在开始">
+<meta name="twitter:image" content="http://durow.vip/images/2016/0718/201607180101.png">
 
 
 
@@ -407,7 +410,47 @@
       
 
       
-        
+        <h2 id="0x00-写在开始"><a href="#0x00-写在开始" class="headerlink" title="0x00 写在开始"></a>0x00 写在开始</h2><a id="more"></a>
+<p>很早开始就对.NET Core比较关注，一改微软之前给人的印象，变得轻量、开源、跨平台。最近打算试着在工作中使用。但工作是在与互联网完全隔离的网络中进行的，因此就开始了在离线环境中部署.NET Core开发环境的尝试。总的来说还是比较蛋疼的，几乎每个阶段都遇到了问题。不过还好最后搞定了，写下这篇博客做个记录，同时分享给有类似需求的童鞋。以下都是亲测有效。</p>
+<h2 id="0x01安装VS2015-Update3"><a href="#0x01安装VS2015-Update3" class="headerlink" title="0x01安装VS2015 Update3"></a>0x01安装VS2015 Update3</h2><p>开发.NET Core可以使用VS2015和VS Code。在这里先讨论VS2015的情况，毕竟如果在Windows下开发，VS2015功能上还是要强太多。.NET Core Web Tools必须要VS2015 Update3以上，也就是首先要在内网安装VS2015 Update3。我刚开始的方式是从官网下载光盘镜像，然后安装。但这样大多数情况下是无法安装的。会提示“安装包丢失或损坏”，之前装VS2015时可以选择跳过文件，装完后也能用（至少WPF没问题），但从VS2015 Update2开始，有些安装包无法选择跳过，只能退出安装。</p>
+<p>之所以提示安装包损坏，是因为系统中缺少</p>
+<ul>
+<li>microsoft root certificate authority 2010</li>
+<li>microsoft root certificate authority 2011</li>
+</ul>
+<p>这两个证书，导致安装包验证无法通过，所以认为损坏。</p>
+<p>解决方法：</p>
+<ul>
+<li>1.找一台正常装了VS2015的电脑，Win+R打开运行，输入certmgr.msc，打开证书管理界面。</li>
+</ul>
+<p><img src="/images/2016/0718/201607180101.png" alt="OffLine"></p>
+<ul>
+<li><p>2.在受信任的根证书颁发机构中找到缺少的两项。按照默认方式导出（不知道为什么我这台电脑上有重复）。</p>
+</li>
+<li><p>3.证书复制到内网，打开证书管理界面，然后在受信任的根证书办法机构中导入证书。</p>
+</li>
+</ul>
+<p>这样就可以正常安装VS2015 Update3了。</p>
+<p>此外还要说明的是除了下载VS2015 Update3的光盘镜像外，还可以离线安装文件，把安装文件考到离线环境下安装。具体方法是：在官方下载页面中下载Web安装程序</p>
+<p><a href="https://www.visualstudio.com/downloads/download-visual-studio-vs" target="_blank" rel="noopener">https://www.visualstudio.com/downloads/download-visual-studio-vs</a></p>
+<p>以community版本为例，在安装程序所在目录打开命令行窗口，输入：vs_community_CHS.exe /layout 这样就可以把文件都离线下来，貌似比光盘镜像内容要多一些。</p>
+<h2 id="0x02-安装DotNetCore-1-0-0-VS2015Tools-Preview2"><a href="#0x02-安装DotNetCore-1-0-0-VS2015Tools-Preview2" class="headerlink" title="0x02 安装DotNetCore.1.0.0-VS2015Tools.Preview2"></a>0x02 安装DotNetCore.1.0.0-VS2015Tools.Preview2</h2><p>这个可以用与VS2015同样的方式离线，下载在线安装程序后，在安装程序所在目录打开命令行窗口输入：</p>
+<p><code>DotNetCore.1.0.0-VS2015Tools.Preview2.exe /layout</code></p>
+<p>即可把安装文件下载到相同目录下packages文件夹里，其中也包含了.Net Core SDK。比较惨的是我的内网电脑装了某国产杀毒软件，每次一运行安装就提示我恶意操作然后强行中止安装，我又没权限关掉杀毒软件，所以只好在一个一个包手动装的，不过好在可以正常使用。因为离线环境总是缺这缺那的，如果安装过程中出现什么问题，只要查看错误log，然后解决就可以。</p>
+<h2 id="0x03-如何使用nuget"><a href="#0x03-如何使用nuget" class="headerlink" title="0x03 如何使用nuget"></a>0x03 如何使用nuget</h2><p>.NET Core的包依赖全都使用nuget，在线环境下自然是方便，离线环境下就稍麻烦一点了。在安装VS2015 Update3时，.NET Core所需的官方依赖包都已经安装在了（默认安装）C:\Program Files (x86)\Microsoft SDKs\NuGetPackages目录下，在nuget管理中也可以看到这是默认的离线包目录，我们需要什么样的包只要把它复制到这个目录，在nuget管理中的程序包源选择离线的源即可。</p>
+<p><img src="/images/2016/0718/201607180301.png" alt="Nuget"></p>
+<p>那么怎么获得离线安装包呢，我们在用nuget安装程序包时会在C:\Users{你的用户名}.nuget\packages目录进行缓存，只要找到缓存的包复制到离线环境，放到nuget离线目录即可。</p>
+<p>另外还有一种方式就是在内网架设nuget服务，这个也十分容易，</p>
+<p><a href="http://edi.wang/Post/2012/12/15/setup-private-nuget-server" target="_blank" rel="noopener">http://edi.wang/Post/2012/12/15/setup-private-nuget-server</a></p>
+<p>阿迪王这篇网文章比较详细，可以参考。考虑到要用的.NET Core比较新，我用的最新版的NugetServer是可以用的，其它版本的没试。服务架设好了在nuget管理中添加新的包源就可以了。</p>
+<p>这种方式同样可以添加其它项目（例如WPF）的包依赖。</p>
+<h2 id="0x04-使用VS-Code开发"><a href="#0x04-使用VS-Code开发" class="headerlink" title="0x04 使用VS Code开发"></a>0x04 使用VS Code开发</h2><p>除了VS外也可以使用VS Code开发.NET Core，我的方式是在能联网的电脑上下载VS Code，然后装一堆需要的插件，插件都装在了C:\Users\{你的用户名}\.vscode\extensions目录下，只要把这个目录打包考到离线环境中，解压到相同目录下就能用了。</p>
+<p>另外用VS Code开发在dotnet restore时需要加-s参数指明包源：dotnet restore -s 包目录。或者在项目的根目录添加nuget.config文件</p>
+<p>此文件可在github上下载：<br><a href="https://github.com/aspnet/Home/blob/dev/samples/latest/HelloMvc/NuGet.Config" target="_blank" rel="noopener">https://github.com/aspnet/Home/blob/dev/samples/latest/HelloMvc/NuGet.Config</a></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span><br><span class="line"><span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">packageSources</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">clear</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">add</span> <span class="attr">key</span>=<span class="string">"AspNetVNext"</span> <span class="attr">value</span>=<span class="string">"https://www.myget.org/F/aspnetvnext/api/v2"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">add</span> <span class="attr">key</span>=<span class="string">"NuGetorg"</span> <span class="attr">value</span>=<span class="string">"https://nuget.org/api/v2/"</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">packageSources</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>在packageSources中添加自己的包源。</p>
+<h2 id="0x05-写在最后"><a href="#0x05-写在最后" class="headerlink" title="0x05 写在最后"></a>0x05 写在最后</h2><p>整个过程还是花了一些时间的，中途有几次很郁闷不想搞了。但实在很想在工作环境中用.NET Core做点东西试试，幸好最终搞定了。想想看还是有些小激动的。</p>
+
       
     </div>
     
@@ -443,6 +486,8 @@
         <div class="post-tags">
           
             <a href="/tags/ASP-NET-Core/" rel="tag"># ASP.NET Core</a>
+          
+            <a href="/tags/离线环境/" rel="tag"># 离线环境</a>
           
         </div>
       
@@ -565,8 +610,17 @@ var jiathis_config={
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -685,6 +739,22 @@ var jiathis_config={
       </section>
 
       
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x00-写在开始"><span class="nav-number">1.</span> <span class="nav-text">0x00 写在开始</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01安装VS2015-Update3"><span class="nav-number">2.</span> <span class="nav-text">0x01安装VS2015 Update3</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-安装DotNetCore-1-0-0-VS2015Tools-Preview2"><span class="nav-number">3.</span> <span class="nav-text">0x02 安装DotNetCore.1.0.0-VS2015Tools.Preview2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-如何使用nuget"><span class="nav-number">4.</span> <span class="nav-text">0x03 如何使用nuget</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x04-使用VS-Code开发"><span class="nav-number">5.</span> <span class="nav-text">0x04 使用VS Code开发</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x05-写在最后"><span class="nav-number">6.</span> <span class="nav-text">0x05 写在最后</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
 
       
         <div class="back-to-top">
@@ -719,7 +789,7 @@ var jiathis_config={
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">15.0k</span>
+    <span title="Site words total count">28.4k</span>
   
 </div>
 

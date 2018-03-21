@@ -83,18 +83,25 @@
 
 
 
-<meta name="description" content="热爱生活 热爱学习">
+<meta name="description" content="0x00 为什么需要Map（MapWhen）扩展">
 <meta name="keywords" content="ASP.NET Core,MVC,中间件,管道">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ASP.NET Core中间件的注册和管道的构建（3）---- 使用Map&#x2F;MapWhen扩展方法">
 <meta property="og:url" content="http://durow.vip/2016/08/09/ASP-NET-Core中间件的注册和管道的构建（3）-使用Map-MapWhen扩展方法/index.html">
 <meta property="og:site_name" content="Durow&#39;s corner">
-<meta property="og:description" content="热爱生活 热爱学习">
+<meta property="og:description" content="0x00 为什么需要Map（MapWhen）扩展">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-03-21T07:05:35.980Z">
+<meta property="og:image" content="http://durow.vip/images/2016/0809/201608090001.png">
+<meta property="og:image" content="http://durow.vip/images/2016/0809/201608090101.png">
+<meta property="og:image" content="http://durow.vip/images/2016/0809/201608090102.png">
+<meta property="og:image" content="http://durow.vip/images/2016/0809/201608090201.png">
+<meta property="og:image" content="http://durow.vip/images/2016/0809/201608090202.png">
+<meta property="og:image" content="http://durow.vip/images/2016/0809/201608090301.png">
+<meta property="og:updated_time" content="2018-03-21T07:30:59.268Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ASP.NET Core中间件的注册和管道的构建（3）---- 使用Map&#x2F;MapWhen扩展方法">
-<meta name="twitter:description" content="热爱生活 热爱学习">
+<meta name="twitter:description" content="0x00 为什么需要Map（MapWhen）扩展">
+<meta name="twitter:image" content="http://durow.vip/images/2016/0809/201608090001.png">
 
 
 
@@ -418,7 +425,26 @@
       
 
       
-        
+        <h2 id="0x00-为什么需要Map（MapWhen）扩展"><a href="#0x00-为什么需要Map（MapWhen）扩展" class="headerlink" title="0x00 为什么需要Map（MapWhen）扩展"></a>0x00 为什么需要Map（MapWhen）扩展</h2><a id="more"></a>
+<p>如果业务逻辑比较简单的话，一条主管道就够了，确实用不到Map。不过当业务逻辑比较复杂的时候，有时候我们可能希望根据情况的不同使用特殊的一组中间件来处理HttpContext。这种情况下如果只用一条管道，处理起来会非常麻烦和混乱。此时就可以使用Map/MapWhen建立一个分支管道，当条件符合我们的设定时，由这个分支管道来处理HttpContext。使用Map/MapWhen添加分支管道是很容易的，只要提供合适跳转到分支管道的判断逻辑，以及分支管道的构建方法就可以了。</p>
+<p><img src="/images/2016/0809/201608090001.png" alt="MapWhen"></p>
+<h2 id="0x01-Map扩展的原理"><a href="#0x01-Map扩展的原理" class="headerlink" title="0x01 Map扩展的原理"></a>0x01 Map扩展的原理</h2><p>前一篇文章中我们说过，中间件的注册和管道的构建都是通过ApplicationBuilder进行的。因此要构建一个分支管道，需要一个新的ApplicationBuilder，并用它来注册中间件，构建管道。为了在分支管道中也能够共享我们在当前ApplicationBuilder中注册的服务（或是说共享依赖注入容器，当然共享的并不止这些），在创建新的ApplicationBuilder时并不是直接new一个全新的，而是调用当前ApplicationBuilder的New方法在当前的基础上创建新的，共享了当前ApplicationBuilder的Properties（其中包含了依赖注入容器）。</p>
+<p>在使用Map注册中间件时我们会传入一个Action&lt;IApplicationBuilder&gt;参数，它的作用就是，当我们创建了新的ApplicationBuilder后，使用这个方法对其进行各种设置，最重要的就是在新的ApplicationBuilder上注册分支管道的中间件。配置完成后调用分支ApplicationBuilder的Builder方法构建管道，并把第一个中间件保存下来作为分支管道的入口。</p>
+<p>在使用Map注册中间件时传入了一个PathString参数，PathString对象我们可以简单地认为是string。它用于记录HttpContext.HttpRequest.Path中要匹配的区段（Segment）。这个字符串参数结尾不能是”/“。如果匹配成功则进入分支管道，匹配失则败继续当前管道。</p>
+<p>新构建的管道和用于匹配的字符串保存为MapOptions对象，保存了Map规则和分支管道的入口。之后构建MapMiddleware对象，并把它的Invoke方法包装为RequestDelegate，使用当前ApplicationBuilder的Use方法注册中间件。</p>
+<p>下面是Map扩展方法：</p>
+<p><img src="/images/2016/0809/201608090101.png" alt="MapWhen"></p>
+<p>下面是MapMiddleware的Invoke方法</p>
+<p><img src="/images/2016/0809/201608090102.png" alt="MapWhen"></p>
+<h2 id="0x02-MapWhen扩展的原理"><a href="#0x02-MapWhen扩展的原理" class="headerlink" title="0x02 MapWhen扩展的原理"></a>0x02 MapWhen扩展的原理</h2><p>Map主要通过URL中的Path来判断是否需要进入分支管道，但有时候我们很可能会有别的需求，例如我想对所有Method为DELETE的请求用特殊管道处理。这时候就需要用MapWhen了。MapWhen是一种通用的Map，可以由使用者来决定什么时候进入分支管道什么时候不进入。可以说Map是MapWhen的一种情况，因为这种情况太常见了，所以官方实现了一个。这样看来MapWhen就很简单了，在Map中我们传入参数PathString来进行HttpRequest.Path的匹配，在MapWhen中我们传入Func&lt;HttpContext,bool&gt;参数，有我们自行指定，当返回true时进入分支管道，返回false则继续当前管道。</p>
+<p>下面是MapWhen扩展方法：</p>
+<p><img src="/images/2016/0809/201608090201.png" alt="MapWhen"></p>
+<p>下面是MapWhenMiddleware的Invoke方法：</p>
+<p><img src="/images/2016/0809/201608090202.png" alt="MapWhen"></p>
+<h2 id="0x03-顺便提一下Run扩展"><a href="#0x03-顺便提一下Run扩展" class="headerlink" title="0x03 顺便提一下Run扩展"></a>0x03 顺便提一下Run扩展</h2><p>还有一个注册中间件的扩展方法是Run，因为非常简单，所以在最后提一下。Run就是用Use注册一个中间件，最后不调用下一个中间件直接返回。所以使用Run扩展方法注册中间件永远都是直接返回的，后面的中间件都不会被调用。</p>
+<p><img src="/images/2016/0809/201608090301.png" alt="MapWhen"></p>
+<h2 id="0x04-写在最后"><a href="#0x04-写在最后" class="headerlink" title="0x04 写在最后"></a>0x04 写在最后</h2><p>Map/MapWhen和Run都很简单就不写测试了。到此为止中间件的注册和管道的构建主题就写完了。刚开始是出于对中间件有些地方的迷惑开始的，搞明白了后本想着写一篇博客分享下自己的心得，没想到越写越多，一篇分成两篇，到现在写了三篇。我这些也只是写了些大概，很多细节没写到，有兴趣的可以去github上看一下代码，管道和中间件相关的都在这个仓库：<br><a href="https://github.com/aspnet/HttpAbstractions" target="_blank" rel="noopener">https://github.com/aspnet/HttpAbstractions</a></p>
+
       
     </div>
     
@@ -582,8 +608,17 @@ var jiathis_config={
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -702,6 +737,22 @@ var jiathis_config={
       </section>
 
       
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x00-为什么需要Map（MapWhen）扩展"><span class="nav-number">1.</span> <span class="nav-text">0x00 为什么需要Map（MapWhen）扩展</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-Map扩展的原理"><span class="nav-number">2.</span> <span class="nav-text">0x01 Map扩展的原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-MapWhen扩展的原理"><span class="nav-number">3.</span> <span class="nav-text">0x02 MapWhen扩展的原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-顺便提一下Run扩展"><span class="nav-number">4.</span> <span class="nav-text">0x03 顺便提一下Run扩展</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x04-写在最后"><span class="nav-number">5.</span> <span class="nav-text">0x04 写在最后</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
 
       
         <div class="back-to-top">
@@ -736,7 +787,7 @@ var jiathis_config={
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">15.0k</span>
+    <span title="Site words total count">28.4k</span>
   
 </div>
 

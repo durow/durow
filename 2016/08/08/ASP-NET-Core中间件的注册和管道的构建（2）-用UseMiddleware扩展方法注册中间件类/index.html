@@ -72,7 +72,7 @@
 
 
 
-  <meta name="keywords" content="ASP.NET Core,MVC,中间件," />
+  <meta name="keywords" content="ASP.NET Core,MVC,中间件,管道," />
 
 
 
@@ -83,18 +83,33 @@
 
 
 
-<meta name="description" content="热爱生活 热爱学习">
-<meta name="keywords" content="ASP.NET Core,MVC,中间件">
+<meta name="description" content="0x00 为什么要引入扩展方法">
+<meta name="keywords" content="ASP.NET Core,MVC,中间件,管道">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ASP.NET Core中间件的注册和管道的构建（2）---- 用UseMiddleware扩展方法注册中间件类">
 <meta property="og:url" content="http://durow.vip/2016/08/08/ASP-NET-Core中间件的注册和管道的构建（2）-用UseMiddleware扩展方法注册中间件类/index.html">
 <meta property="og:site_name" content="Durow&#39;s corner">
-<meta property="og:description" content="热爱生活 热爱学习">
+<meta property="og:description" content="0x00 为什么要引入扩展方法">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-03-21T02:30:09.743Z">
+<meta property="og:image" content="http://durow.vip/images/2016/0808/201608080101.png">
+<meta property="og:image" content="http://durow.vip/images/2016/0808/201608080102.png">
+<meta property="og:image" content="http://durow.vip/images/2016/0808/201608080201.png">
+<meta property="og:image" content="http://durow.vip/images/2016/0808/201608080202.png">
+<meta property="og:image" content="http://durow.vip/images/2016/0808/201608080203.png">
+<meta property="og:image" content="http://durow.vip/images/2016/0808/201608080204.png">
+<meta property="og:image" content="http://durow.vip/images/2016/0808/201608080205.png">
+<meta property="og:image" content="http://durow.vip/images/2016/0808/201608080206.png">
+<meta property="og:image" content="http://durow.vip/images/2016/0808/201608080401.png">
+<meta property="og:image" content="http://durow.vip/images/2016/0808/201608080402.png">
+<meta property="og:image" content="http://durow.vip/images/2016/0808/201608080403.png">
+<meta property="og:image" content="http://durow.vip/images/2016/0808/201608080404.png">
+<meta property="og:image" content="http://durow.vip/images/2016/0808/201608080405.png">
+<meta property="og:image" content="http://durow.vip/images/2016/0808/201608080406.png">
+<meta property="og:updated_time" content="2018-03-21T07:52:14.892Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ASP.NET Core中间件的注册和管道的构建（2）---- 用UseMiddleware扩展方法注册中间件类">
-<meta name="twitter:description" content="热爱生活 热爱学习">
+<meta name="twitter:description" content="0x00 为什么要引入扩展方法">
+<meta name="twitter:image" content="http://durow.vip/images/2016/0808/201608080101.png">
 
 
 
@@ -418,7 +433,70 @@
       
 
       
-        
+        <h2 id="0x00-为什么要引入扩展方法"><a href="#0x00-为什么要引入扩展方法" class="headerlink" title="0x00 为什么要引入扩展方法"></a>0x00 为什么要引入扩展方法</h2><a id="more"></a>
+<p>有的中间件功能比较简单，有的则比较复杂，并且依赖其它组件。除了直接用ApplicationBuilder的Use()方法注册中间件外，还可以使用ApplicationBuilder的扩展方法UseMiddleware()注册中间件。这种情况下可以注册类型，这个方法会通过反射解析这个类型，并把它包装成Func&lt;ReuqestDelegate,RequestDelegate&gt;然后调用Use()方法注册。</p>
+<p>遇到这种情况一般直觉上是通过继承一个抽象类并实现其中的方法在写一个中间件。不过.NET Core不是这么做的。中间件类使用约定而不是继承来进行约束。这里说的约定就是约定原本的意思，例如约定好了中间件类中必须包含一个叫Invoke的方法，叫别的就不行，有重载也不行。因为中间件类没有任何继承上的约束，在注册过程中就是通过反射去寻找名字为Invoke的方法，然后把它包装成RequestDelegate的。这篇文章就是要说一下写一个中间件类都有哪些约定以及中间件类的注册。</p>
+<h2 id="0x01-一个最简单的例子"><a href="#0x01-一个最简单的例子" class="headerlink" title="0x01 一个最简单的例子"></a>0x01 一个最简单的例子</h2><p>先看一个中间件类的最简单的例子：</p>
+<p><img src="/images/2016/0808/201608080101.png" alt="Use"></p>
+<p>上一篇文章中说过了，中间件本质就是一个方法，这个方法接收一个HttpContext参数，返回Task。在上面这个中间件类中Invoke就是这个方法。为了能够调用下一个中间件，当前中间件还需要保存下一个中间件的引用。这个引用是通过构造函数传进来的，如果当前中间件不需要调用后面中间件的话，这个引用完全可以不保存。如果要注册这个中间件，我们可以这样做：</p>
+<p><img src="/images/2016/0808/201608080102.png" alt="Use"></p>
+<p>但如果我们这个中间件比较复杂，依赖很多其他模块，那么我们在注册的时候需要构造依赖模块的实例，并在中间件类的构造函数中把这些依赖传进去。这加强了中间件和依赖模块之间的耦合度。为了能减少这种耦合，同时享受到依赖注入带来的便利，提供了UseMiddleware<t>扩展方法来注册中间件类T。</t></p>
+<p>UseMiddleware扩展方法会找到上面中间件类中的Invoke方法，创建上面类的实例，在创建实例时遇到需要注入的类型会尝试注入，然后把Invoke方法包装为ReuqestDelegate，进而包装为Func&lt;RequestDelegate,RequestDelegate&gt;，然后通过ApplicatonBuilder的Use方法（上篇文章讲过了）注册到IList&lt;Func&lt;RequestDelegaet,RequestDelegate&gt;中。</p>
+<p>从上面的SimpleMiddleware我们可以看到这个类没有任何显示的继承关系，那么我们在写一个中间件类时需要注意哪些约束呢？我们只要看一下UseMiddleware注册中间件的过程就明白了。下面是对UseMiddleware()方法的分析，对代码分析不感兴趣的可以跳过直接看后面的结论和测试。</p>
+<h2 id="0x02-扩展方法注册中间件类的过程"><a href="#0x02-扩展方法注册中间件类的过程" class="headerlink" title="0x02 扩展方法注册中间件类的过程"></a>0x02 扩展方法注册中间件类的过程</h2><p>使用UseMiddleware&lt;T&gt;扩展方法注册中间件类T主要包含以下几个关键步骤：</p>
+<h3 id="1-找到中间件类的Invoke方法"><a href="#1-找到中间件类的Invoke方法" class="headerlink" title="1.找到中间件类的Invoke方法"></a>1.找到中间件类的Invoke方法</h3><p>UseMiddleware方法会通过反射获取注册的中间件类的所有public且非static的方法列表，然后从其中找出名字叫Invoke的方法，确认Invoke方法没有重载，确认Invoke方法返回Task，确认Invoke方法第一个参数是HttpContext，最后这两个检查是为了能把Invoke方法包装为RequestDelegate。</p>
+<p><img src="/images/2016/0808/201608080201.png" alt="Use"></p>
+<h3 id="2-选取最佳构造函数"><a href="#2-选取最佳构造函数" class="headerlink" title="2.选取最佳构造函数"></a>2.选取最佳构造函数</h3><p>把下一个中间件的引用next插入到从UseMiddleware传入的参数列表的第一个，作为给定的参数列表。</p>
+<p><img src="/images/2016/0808/201608080202.png" alt="Use"></p>
+<p>然后获取中间件类的所有构造函数，从给定的参数列表中依次取出参数，和构造函数的参数进行类型匹配，匹配最多的构造函数选为最佳构造函数。匹配相同的以代码中排在前面的构造函数为准（这其中省略了很多匹配最佳构造函数的细节，感兴趣的可以自行查看代码）。</p>
+<p><img src="/images/2016/0808/201608080203.png" alt="Use"></p>
+<p>值得注意的是如果存在给定的参数列表中存在某个参数P，在当前构造函数参数列表中找不到与之匹配的类型，那么这个构造函数不能作为最佳构造函数。也就是说选中的最佳构造函数的参数列表必须要是给定参数列表的超集。刚刚上面也说了，下一个中间件next被插入到了给定参数列表的第一个，因此选中的最佳构造函数参数中必须包含参数RequestDelegate。如果所有构造函数都不包含RequestDelegate，那么会抛出异常。</p>
+<p><img src="/images/2016/0808/201608080204.png" alt="Use"></p>
+<h3 id="3-构造中间件类的实例"><a href="#3-构造中间件类的实例" class="headerlink" title="3.构造中间件类的实例"></a>3.构造中间件类的实例</h3><p>找到了最佳构造函数后，接下来就使用该构造函数构造中间件类的实例。对于构造函数中的所有参数，能够从给定的参数列表中找到类型匹配的，从给定的参数列表中获取参数。从参数列表中找不到的，则尝试从依赖注入容器中获取，依赖注入容器中也找不到的检查是不是有默认值，默认值也没有就抛出异常。</p>
+<p><img src="/images/2016/0808/201608080205.png" alt="Use"></p>
+<h3 id="4-包装委托"><a href="#4-包装委托" class="headerlink" title="4.包装委托"></a>4.包装委托</h3><p>实例构造完成后，如果Invoke方法只有一个参数（HttpContext）会把这个实例的Invoke方法包装为RequestDelegate，进而包装为Func&lt;RequestDelegate,RequestDelegate&gt;然后使用Use方法注册。如果有多个参数，不符合RequestDelegate约束，则对Invoke进行二次包装以符合RequestDelegate。在二次包装中会尝试从依赖注入容器中获取Invoke参数中的依赖。</p>
+<p><img src="/images/2016/0808/201608080206.png" alt="Use"></p>
+<h2 id="0x03一些结论"><a href="#0x03一些结论" class="headerlink" title="0x03一些结论"></a>0x03一些结论</h2><p>下面总结一下中间件类的一些约定，主要是基于对代码的理解，有错误或不全的地方请指正。</p>
+<p>关于中间件的方法：</p>
+<ul>
+<li>1.中间件的方法必须叫Invoke，且为public，非static。</li>
+<li>2.Invoke方法第一个参数必须是HttpContext类型。</li>
+<li>3.Invoke方法必须返回Task。</li>
+<li>4.Invoke方法可以有多个参数，除HttpContext外其它参数会尝试从依赖注入容器中获取。</li>
+<li>5.Invoke方法不能有重载。</li>
+</ul>
+<p>关于构造函数：</p>
+<ul>
+<li>1.构造函数必须包含RequestDelegate参数，该参数传入的是下一个中间件。</li>
+<li>2.构造函数参数中的RequestDelegate参数不是必须放在第一个，可以是任意位置。</li>
+<li>3.构造函数可以有多个参数，参数会优先从给定的参数列表中找，其次会从依赖注入容器中获取，获取失败会尝试获取默认值，都失败会抛出异常。</li>
+<li>4.构造函数可以有多个，届时会根据构造函数参数列表和给定的参数列表选择匹配度最高的一个。</li>
+</ul>
+<p>个人建议，真的仅仅是个人的一些建议：</p>
+<ul>
+<li>1.除及特殊情况外只保留一个构造函数，以省去多余的构造函数匹配检查。</li>
+<li>2.在构造函数中注入所需依赖而不是Invoke中。</li>
+<li>3.关于构造函数参数的顺序，把RequestDelegate放在第一个；之后是UseMiddleware方法中给出的参数，而且构造函数中参数顺序和给定参数列表中的顺序最好也相同；然后是需要注入的参数；最后是有默认值的参数。以上除了默认值参数必须放在最后外其余的顺序都不是必须的，但按照上面的顺序会比较清晰，而且能使实例创建的开销最小。</li>
+<li>4.Invoke方法只保留一个HttpContext参数。这样可以省去对Invoke方法的二次包装。</li>
+<li>5.进一步扩展ApplicationBuilder，创建语义更加明确的方法代替Use/UseMiddleware，例如UseMVC、UseStaticFiles。</li>
+</ul>
+<p>其中1中所说的及特殊的情况，我能想到的就是给UseMiddleware提供不同的参数列表，进而匹配到不同的构造函数创建实例。具体使用场景没有想到。</p>
+<h2 id="0x04-测试"><a href="#0x04-测试" class="headerlink" title="0x04 测试"></a>0x04 测试</h2><p>上篇文章中我们写过一个记录后面所有中间件耗时的中间件。当时直接用Use方法注册的。现在我们把它写为一个中间件类，并且把计时功能写为一个StopWatch类，并添加到依赖注入容器中。</p>
+<p>下面是计时器类的代码：</p>
+<p><img src="/images/2016/0808/201608080401.png" alt="Use"></p>
+<p>下面是中间件类的代码</p>
+<p><img src="/images/2016/0808/201608080402.png" alt="Use"></p>
+<p>下面是向依赖注入容器中添加StopWatch</p>
+<p><img src="/images/2016/0808/201608080403.png" alt="Use"></p>
+<p>下面是使用UseMiddleware扩展方法添加TimeMiddleware中间件代码</p>
+<p><img src="/images/2016/0808/201608080404.png" alt="Use"></p>
+<p>当然，也可以不把StopWatch添加到依赖注入容器中，而是在UserMiddleware方法中直接给出参数。</p>
+<p><img src="/images/2016/0808/201608080405.png" alt="Use"></p>
+<p>如果既在依赖注入容器中添加了StopWatch，又在UseMiddleware注册时提供了StopWatch，那么按照参数匹配顺序最终使用的是注册时提供的StopWatch。</p>
+<p>运行一下可以看到与上篇文章同样的效果。</p>
+<p><img src="/images/2016/0808/201608080406.png" alt="Use"></p>
+<h2 id="0x05-写在最后"><a href="#0x05-写在最后" class="headerlink" title="0x05 写在最后"></a>0x05 写在最后</h2><p>UseMiddleware方法使注册中间件变得容易，同事也减小了中间件和其它依赖模块间的耦合。不过不管哪种扩展方法，最终都是通过Use方法实现中间件的注册。下一篇文章将写一下注册中间件的其它扩展方法Map、MapWhen和Run。</p>
+
       
     </div>
     
@@ -458,6 +536,8 @@
             <a href="/tags/MVC/" rel="tag"># MVC</a>
           
             <a href="/tags/中间件/" rel="tag"># 中间件</a>
+          
+            <a href="/tags/管道/" rel="tag"># 管道</a>
           
         </div>
       
@@ -580,8 +660,17 @@ var jiathis_config={
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -700,6 +789,22 @@ var jiathis_config={
       </section>
 
       
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x00-为什么要引入扩展方法"><span class="nav-number">1.</span> <span class="nav-text">0x00 为什么要引入扩展方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-一个最简单的例子"><span class="nav-number">2.</span> <span class="nav-text">0x01 一个最简单的例子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-扩展方法注册中间件类的过程"><span class="nav-number">3.</span> <span class="nav-text">0x02 扩展方法注册中间件类的过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-找到中间件类的Invoke方法"><span class="nav-number">3.1.</span> <span class="nav-text">1.找到中间件类的Invoke方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-选取最佳构造函数"><span class="nav-number">3.2.</span> <span class="nav-text">2.选取最佳构造函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-构造中间件类的实例"><span class="nav-number">3.3.</span> <span class="nav-text">3.构造中间件类的实例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-包装委托"><span class="nav-number">3.4.</span> <span class="nav-text">4.包装委托</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03一些结论"><span class="nav-number">4.</span> <span class="nav-text">0x03一些结论</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x04-测试"><span class="nav-number">5.</span> <span class="nav-text">0x04 测试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x05-写在最后"><span class="nav-number">6.</span> <span class="nav-text">0x05 写在最后</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
 
       
         <div class="back-to-top">
@@ -734,7 +839,7 @@ var jiathis_config={
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">15.0k</span>
+    <span title="Site words total count">28.4k</span>
   
 </div>
 
