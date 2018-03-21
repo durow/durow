@@ -306,220 +306,6 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://durow.vip/2018/03/21/ASP-NET-Core-MVC中的路由（2）在路由中使用约束/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="durow">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/logo.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Durow's corner">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/21/ASP-NET-Core-MVC中的路由（2）在路由中使用约束/" itemprop="url">ASP.NET Core MVC中的路由（2）在路由中使用约束</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-21T08:12:08+08:00">
-                2018-03-21
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/NET-Core/" itemprop="url" rel="index">
-                    <span itemprop="name">.NET Core</span>
-                  </a>
-                </span>
-
-                
-                
-                  ， 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/NET-Core/MVC/" itemprop="url" rel="index">
-                    <span itemprop="name">MVC</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/2018/03/21/ASP-NET-Core-MVC中的路由（2）在路由中使用约束/" class="leancloud_visitors" data-flag-title="ASP.NET Core MVC中的路由（2）在路由中使用约束">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body han-init-context" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="0x00-路由模板中的约束"><a href="#0x00-路由模板中的约束" class="headerlink" title="0x00 路由模板中的约束"></a>0x00 路由模板中的约束</h2><p>在配置路由模板时，除了以静态字符和变量的形式外，还可以通过配置对变量进行约束。实际如果不嫌麻烦的话在路由到的Action中对变量进行检查也是一种方法，不过对于变量的通用的约束当然是放在路由层面更加合适。而且这样做会简化Action的代码，使Action更加专注于自身业务，符合AOP的思路。这篇文章主要介绍路由模板中的约束。</p>
-<h2 id="0x01-在路由模板中使用约束"><a href="#0x01-在路由模板中使用约束" class="headerlink" title="0x01 在路由模板中使用约束"></a>0x01 在路由模板中使用约束</h2><p>在路由模板中使用约束是很简单的，如下所示：</p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;controller=Home&#125;/&#123;action=Index&#125;/&#123;id:<span class="keyword">int</span>?&#125;</span><br></pre></td></tr></table></figure>
-<p>这个模板就对id进行了约束，约束是通过冒号（:）实现的，冒号后为约束的内容。Int?代表id约束为int?类型，只有id能被转换为int?类型模板匹配才算成功。即使用int.TryParse()方法返回true。</p>
-<ul>
-<li>Home/Index/123匹配成功，id为123</li>
-<li>Home/Index/abc 匹配失败，因为abc无法转换为int?</li>
-<li>Home/Index匹配成功，此时id为null</li>
-</ul>
-<p>和配置默认值一样，除了直接在模板中配置外，也可以在MapRoute方法中通过传入参数进行配置：</p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">routes.MapRoute(</span><br><span class="line">    name: <span class="string">"default"</span>,</span><br><span class="line">    template: <span class="string">"&#123;controller&#125;/&#123;action&#125;/&#123;id?&#125;"</span>,</span><br><span class="line">    defaults: <span class="keyword">new</span></span><br><span class="line">    &#123;</span><br><span class="line">        controller = <span class="string">"Home"</span>,</span><br><span class="line">        action = <span class="string">"Index"</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    constraints: <span class="keyword">new</span></span><br><span class="line">    &#123;</span><br><span class="line">        id = <span class="keyword">new</span> IntRouteConstraint()</span><br><span class="line">&#125;);</span><br><span class="line">``` CS</span><br><span class="line"></span><br><span class="line">效果是一样的。如果我们要对一个变量使用多个约束，只需要在约束后面继续用冒号加约束即可。例如</span><br><span class="line"></span><br><span class="line">``` CS</span><br><span class="line">&#123;controller=Home&#125;/&#123;action=Index&#125;/&#123;id:<span class="keyword">int</span>:min(<span class="number">0</span>)&#125;</span><br></pre></td></tr></table></figure>
-<p>这个模板中id被约束为int类型且最小值为0。同样的也可以以参数的方式配置：</p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">routes.MapRoute(</span><br><span class="line">    name: <span class="string">"default"</span>,</span><br><span class="line">    template: <span class="string">"&#123;controller&#125;/&#123;action&#125;/&#123;id?&#125;"</span>,</span><br><span class="line">    defaults: <span class="keyword">new</span></span><br><span class="line">    &#123;</span><br><span class="line">        controller = <span class="string">"Home"</span>,</span><br><span class="line">        action = <span class="string">"Index"</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    constraints: <span class="keyword">new</span></span><br><span class="line">    &#123;</span><br><span class="line">        id = <span class="keyword">new</span> CompositeRouteConstraint(</span><br><span class="line">            <span class="keyword">new</span> IRouteConstraint[]</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">new</span> IntRouteConstraint(),</span><br><span class="line">                <span class="keyword">new</span> MinRouteConstraint(<span class="number">0</span>)</span><br><span class="line">            &#125;)</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-<p>可以达到同样的效果，不过直接写到模板更加简洁和直观。</p>
-<h2 id="0x02-NetCore-MVC中内建的约束"><a href="#0x02-NetCore-MVC中内建的约束" class="headerlink" title="0x02 .NetCore MVC中内建的约束"></a>0x02 .NetCore MVC中内建的约束</h2><p>.NetCore MVC中内建了大量的约束可供使用。其中大多数基于类型的约束都是使用该类型的TryParse()来尝试转换变量提取出来的字符串，返回ture则通过约束，返回false违反约束。</p>
-<h3 id="1-约束为int：int，对应的类为IntRouteConstraint"><a href="#1-约束为int：int，对应的类为IntRouteConstraint" class="headerlink" title="1.约束为int：int，对应的类为IntRouteConstraint"></a>1.约束为int：int，对应的类为IntRouteConstraint</h3><p>例子：<code>{controller=Home}/{action=Index}/{id:int }</code></p>
-<h3 id="2-约束为float：float，对应的类为FloatRouteConstraint"><a href="#2-约束为float：float，对应的类为FloatRouteConstraint" class="headerlink" title="2.约束为float：float，对应的类为FloatRouteConstraint"></a>2.约束为float：float，对应的类为FloatRouteConstraint</h3><p>例子：<code>{controller=Home}/{action=Index}/{id:float }</code></p>
-<h3 id="3-约束为long：long，对应的类为LongRouteConstraint"><a href="#3-约束为long：long，对应的类为LongRouteConstraint" class="headerlink" title="3.约束为long：long，对应的类为LongRouteConstraint"></a>3.约束为long：long，对应的类为LongRouteConstraint</h3><p>例子：<code>{controller=Home}/{action=Index}/{id:long}</code></p>
-<h3 id="4-约束为double：double，对应的类为DoubleRouteConstraint"><a href="#4-约束为double：double，对应的类为DoubleRouteConstraint" class="headerlink" title="4.约束为double：double，对应的类为DoubleRouteConstraint"></a>4.约束为double：double，对应的类为DoubleRouteConstraint</h3><p>例子：<code>{controller=Home}/{action=Index}/{id:double }</code></p>
-<h3 id="5-约束为decimal：decimal，对应的类为DecimalRouteConstraint"><a href="#5-约束为decimal：decimal，对应的类为DecimalRouteConstraint" class="headerlink" title="5.约束为decimal：decimal，对应的类为DecimalRouteConstraint"></a>5.约束为decimal：decimal，对应的类为DecimalRouteConstraint</h3><p>例子：<code>{controller=Home}/{action=Index}/{id:decimal }</code></p>
-<h3 id="6-约束为布尔值：bool，对应的类为BoolRouteConstraint"><a href="#6-约束为布尔值：bool，对应的类为BoolRouteConstraint" class="headerlink" title="6.约束为布尔值：bool，对应的类为BoolRouteConstraint"></a>6.约束为布尔值：bool，对应的类为BoolRouteConstraint</h3><p>例子：<code>{controller=Home}/{action=Index}/{id:bool}</code></p>
-<h3 id="7-约束为字母：alpha，对应的类为AlphaRouteConstraint"><a href="#7-约束为字母：alpha，对应的类为AlphaRouteConstraint" class="headerlink" title="7.约束为字母：alpha，对应的类为AlphaRouteConstraint"></a>7.约束为字母：alpha，对应的类为AlphaRouteConstraint</h3><p>例子：<code>{controller=Home}/{action=Index}/{id:alpha}</code></p>
-<h3 id="8-约束为时间日期：datetime，对应的类为DateTimeRouteConstraint"><a href="#8-约束为时间日期：datetime，对应的类为DateTimeRouteConstraint" class="headerlink" title="8.约束为时间日期：datetime，对应的类为DateTimeRouteConstraint"></a>8.约束为时间日期：datetime，对应的类为DateTimeRouteConstraint</h3><p>例子：{controller=Home}/{action=Index}/{id:datetime}</p>
-<h3 id="9-约束为GUID：guid，对应的类为GuidRouteConstraint"><a href="#9-约束为GUID：guid，对应的类为GuidRouteConstraint" class="headerlink" title="9.约束为GUID：guid，对应的类为GuidRouteConstraint"></a>9.约束为GUID：guid，对应的类为GuidRouteConstraint</h3><p>例子：{controller=Home}/{action=Index}/{id:bool}</p>
-<h3 id="10-约束长度：length-len-，对应的类为LengthRouteConstraint-len"><a href="#10-约束长度：length-len-，对应的类为LengthRouteConstraint-len" class="headerlink" title="10.约束长度：length(len)，对应的类为LengthRouteConstraint(len)"></a>10.约束长度：length(len)，对应的类为LengthRouteConstraint(len)</h3><p>例子：{controller=Home}/{action=Index}/{id:length(5) }</p>
-<h3 id="11-约束最小长度：minlength-len-，对应的类为MinLengthRouteConstraint-len"><a href="#11-约束最小长度：minlength-len-，对应的类为MinLengthRouteConstraint-len" class="headerlink" title="11.约束最小长度：minlength(len)，对应的类为MinLengthRouteConstraint(len)"></a>11.约束最小长度：minlength(len)，对应的类为MinLengthRouteConstraint(len)</h3><p>例子：{controller=Home}/{action=Index}/{id:minlength(5)}</p>
-<h3 id="12-约束最大长度：maxlength-len-，对应的类为MaxLengthRouteConstraint-len"><a href="#12-约束最大长度：maxlength-len-，对应的类为MaxLengthRouteConstraint-len" class="headerlink" title="12.约束最大长度：maxlength(len)，对应的类为MaxLengthRouteConstraint(len)"></a>12.约束最大长度：maxlength(len)，对应的类为MaxLengthRouteConstraint(len)</h3><p>例子：{controller=Home}/{action=Index}/{id:maxlength(10)}</p>
-<h3 id="13-约束长度范围：length-min-max-，对应的类为LengthRouteConstraint-min-max"><a href="#13-约束长度范围：length-min-max-，对应的类为LengthRouteConstraint-min-max" class="headerlink" title="13.约束长度范围：length(min,max)，对应的类为LengthRouteConstraint(min,max)"></a>13.约束长度范围：length(min,max)，对应的类为LengthRouteConstraint(min,max)</h3><p>例子：{controller=Home}/{action=Index}/{id:length(5,10)}</p>
-<h3 id="14-约束最小值：min-v-，对应的类为MinRouteConstraint-v"><a href="#14-约束最小值：min-v-，对应的类为MinRouteConstraint-v" class="headerlink" title="14.约束最小值：min(v)，对应的类为MinRouteConstraint(v)"></a>14.约束最小值：min(v)，对应的类为MinRouteConstraint(v)</h3><p>例子：{controller=Home}/{action=Index}/{id:min(0)}</p>
-<h3 id="15-约束最大值：max-v-，对应的类为MaxRouteConstraint-v"><a href="#15-约束最大值：max-v-，对应的类为MaxRouteConstraint-v" class="headerlink" title="15.约束最大值：max(v)，对应的类为MaxRouteConstraint(v)"></a>15.约束最大值：max(v)，对应的类为MaxRouteConstraint(v)</h3><p>例子：{controller=Home}/{action=Index}/{id:max(1000)}</p>
-<h3 id="16-约束范围：range-min-max-，对应的类为RangeRouteConstraint-min-max"><a href="#16-约束范围：range-min-max-，对应的类为RangeRouteConstraint-min-max" class="headerlink" title="16.约束范围：range(min,max)，对应的类为RangeRouteConstraint(min,max)"></a>16.约束范围：range(min,max)，对应的类为RangeRouteConstraint(min,max)</h3><p>例子：{controller=Home}/{action=Index}/{id:range(0,1000) }</p>
-<h3 id="17-约束正则表达式：regex-exp-，对应的类为RegexRouteConstraint-exp"><a href="#17-约束正则表达式：regex-exp-，对应的类为RegexRouteConstraint-exp" class="headerlink" title="17.约束正则表达式：regex(exp)，对应的类为RegexRouteConstraint(exp)"></a>17.约束正则表达式：regex(exp)，对应的类为RegexRouteConstraint(exp)</h3><p>例子：{controller:regex(^My.*)=Home }/{action=Index}/{id?}</p>
-<h2 id="0x03-创建自定义约束"><a href="#0x03-创建自定义约束" class="headerlink" title="0x03 创建自定义约束"></a>0x03 创建自定义约束</h2><p>除了使用内建的约束外，还可以自定义约束。只要实现IRouteConstraint接口即可。这个接口定义了一个方法：</p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">Match</span>(<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">    HttpContext httpContext,   //Http上下文信息</span></span></span><br><span class="line"><span class="function"><span class="params">    IRouter route,            //当前正在测试的模板信息</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">string</span> routeKey,           //当前正在测试约束的变量名称</span></span></span><br><span class="line"><span class="function"><span class="params">    RouteValueDictionary values, //模板中变量提取出的值</span></span></span><br><span class="line"><span class="function"><span class="params">    RouteDirection routeDirection</span>) <span class="comment">//路由方向，枚举，值包括IncominRequestg和UrlGeneration</span></span></span><br></pre></td></tr></table></figure>
-<p>这个方法返回ture说明符合约束，返回false说明违反约束。下面我们通过实现这个接口定义一个约束，把id约束为偶数。</p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">EvenRouteConstraint</span> : <span class="title">IRouteConstraint</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">bool</span> <span class="title">Match</span>(<span class="params">HttpContext httpContext, IRouter route, <span class="keyword">string</span> routeKey, RouteValueDictionary values, RouteDirection routeDirection</span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> id;</span><br><span class="line">        <span class="keyword">if</span> (!<span class="keyword">int</span>.TryParse(values[routeKey].ToString(), <span class="keyword">out</span> id))</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">            </span><br><span class="line">        <span class="keyword">return</span> id % <span class="number">2</span> == <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>然后这样配置路由来约束id：</p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">routes.MapRoute(</span><br><span class="line">    name: <span class="string">"default"</span>,</span><br><span class="line">    template: <span class="string">"&#123;controller&#125;/&#123;action&#125;/&#123;id?&#125;"</span>,</span><br><span class="line">    defaults: <span class="keyword">new</span></span><br><span class="line">    &#123;</span><br><span class="line">        controller = <span class="string">"Home"</span>,</span><br><span class="line">        action = <span class="string">"Index"</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    constraints: <span class="keyword">new</span></span><br><span class="line">    &#123;</span><br><span class="line">        id = <span class="keyword">new</span> EvenRouteConstraint()</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-<p>这样配置后</p>
-<ul>
-<li>空Path路由到HomeController的Index，id为空</li>
-<li>Home/Index/12路由到HomeController的Index，id为12，是偶数</li>
-<li>Home/Index/13匹配失败，id为13，不是偶数。</li>
-</ul>
-<p>除了使用constraints参数添加自定义路由约束外，也可以把自定义路由约束映射为字符串，用于路由模板中。</p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ConfigureServices</span>(<span class="params">IServiceCollection services</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">        services.Configure&lt;RouteOptions&gt;(options=&gt;</span><br><span class="line">        &#123;</span><br><span class="line">            options.ConstraintMap.Add(<span class="string">"even"</span>,<span class="keyword">typeof</span>(EvenRouteConstraint));</span><br><span class="line">        &#125;);</span><br><span class="line">        <span class="comment">// Add framework services.</span></span><br><span class="line">        services.AddMvc();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这样配置后路由模板写成：</p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">routes.MapRoute(</span><br><span class="line">    name: <span class="string">"default"</span>,</span><br><span class="line">    template: <span class="string">"&#123;controller=Home&#125;/&#123;action=Index&#125;/&#123;id:even?&#125;"</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-<p>可以达到同样的效果。把约束映射为字符串后，还可以方便的在Route特性中使用，例如：</p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[<span class="meta">Route(<span class="meta-string">"durow/Test/[action]/&#123;id:even?&#125;"</span>)</span>]</span><br></pre></td></tr></table></figure>
-<h2 id="0x04-相关代码"><a href="#0x04-相关代码" class="headerlink" title="0x04 相关代码"></a>0x04 相关代码</h2><p><a href="https://github.com/durow/NetCoreStudy/tree/master/src/RouteStudy" target="_blank" rel="noopener">https://github.com/durow/NetCoreStudy/tree/master/src/RouteStudy</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://durow.vip/2018/03/20/start/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -791,6 +577,174 @@
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2016/11/30/在ASP-NET-Core中使用百度在线编辑器UEditor/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://durow.vip/2016/10/30/ASP-NET-Core-MVC中的路由（2）在路由中使用约束/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="durow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/logo.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Durow's corner">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2016/10/30/ASP-NET-Core-MVC中的路由（2）在路由中使用约束/" itemprop="url">ASP.NET Core MVC中的路由（2）在路由中使用约束</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-10-30T12:27:00+08:00">
+                2016-10-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/NET-Core/" itemprop="url" rel="index">
+                    <span itemprop="name">.NET Core</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/NET-Core/MVC/" itemprop="url" rel="index">
+                    <span itemprop="name">MVC</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2016/10/30/ASP-NET-Core-MVC中的路由（2）在路由中使用约束/" class="leancloud_visitors" data-flag-title="ASP.NET Core MVC中的路由（2）在路由中使用约束">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p><img src="/images/2016/1030/201610300000.png" alt="ASP.NET"></p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2016/10/30/ASP-NET-Core-MVC中的路由（2）在路由中使用约束/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
