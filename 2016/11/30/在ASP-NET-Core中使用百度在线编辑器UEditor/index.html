@@ -89,12 +89,12 @@
 <meta property="og:url" content="http://durow.vip/2016/11/30/在ASP-NET-Core中使用百度在线编辑器UEditor/index.html">
 <meta property="og:site_name" content="Durow&#39;s corner">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://durow.vip/images/2016/1130/201611300000.png">
-<meta property="og:image" content="http://durow.vip/images/2016/1130/201611300101.png">
-<meta property="og:updated_time" content="2018-03-20T09:15:16.331Z">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/1130/201611300000.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/1130/201611300101.png">
+<meta property="og:updated_time" content="2018-03-22T06:38:50.793Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="在ASP.NET Core中使用百度在线编辑器UEditor">
-<meta name="twitter:image" content="http://durow.vip/images/2016/1130/201611300000.png">
+<meta name="twitter:image" content="http://durow.gitee.io/source/images/2016/1130/201611300000.png">
 
 
 
@@ -407,10 +407,10 @@
       
 
       
-        <p><img src="/images/2016/1130/201611300000.png" alt="UEditor"></p>
+        <p><img src="http://durow.gitee.io/source/images/2016/1130/201611300000.png" alt="UEditor"></p>
 <a id="more"></a>
 <h2 id="0x00-起因"><a href="#0x00-起因" class="headerlink" title="0x00 起因"></a>0x00 起因</h2><p>最近需要一个在线编辑器，之前听人说过百度的UEditor不错，去官网下了一个。不过服务端只有ASP.NET版的，如果是为了能尽快使用，只要把ASP.NET版的服务端作为应用部署在IIS上就可以立即使用了。不过我的需求并不急，所以把ASP.NET移植到了ASP.NET Core上。整个过程很简单，只是重新引用了一些包，修改了几处代码，另外就是把Controller中比较长的一个switch语句块重构为了字典，根据url中的action参数从字典中找出并调用相应的Action处理，这样的好处就是如果要扩展action支持的操作无需修改源代码，只要扩展字典就可以，对扩展开放，对修改关闭。最后把服务端功能打成了nuget包UEditorNetCore，方便使用。这篇博客主要就介绍下如何使用UEditorNetCore快速实现UEditor服务端，也可以直接使用源代码中的示例，希望对有这方面需求的园友有所帮助。</p>
-<h2 id="0x01-总体设计"><a href="#0x01-总体设计" class="headerlink" title="0x01 总体设计"></a>0x01 总体设计</h2><p><img src="/images/2016/1130/201611300101.png" alt="总体设计"></p>
+<h2 id="0x01-总体设计"><a href="#0x01-总体设计" class="headerlink" title="0x01 总体设计"></a>0x01 总体设计</h2><p><img src="http://durow.gitee.io/source/images/2016/1130/201611300101.png" alt="总体设计"></p>
 <p>当接收到action后，UEditorService会从UEditorActionCollection中找到这个action对应的方法并调用，同时传入HttpContext参数。这些方法调用基层的服务XxxxHandler完成功能，并把返回内容通过HttpContext.Response.WriteAsync()方法写入。如果要扩展对action的支持，可以扩展UEditorActionCollection，具体方法后面有介绍。</p>
 <h2 id="0x02-如何使用UEditorNetCore"><a href="#0x02-如何使用UEditorNetCore" class="headerlink" title="0x02 如何使用UEditorNetCore"></a>0x02 如何使用UEditorNetCore</h2><h3 id="1-安装UEditorNetCore"><a href="#1-安装UEditorNetCore" class="headerlink" title="1.安装UEditorNetCore"></a>1.安装UEditorNetCore</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Install-Package UEditorNetCore</span><br></pre></td></tr></table></figure>
 <h3 id="2-在Startup-cs的ConfigureServices方法中添加UEditorNetCore服务"><a href="#2-在Startup-cs的ConfigureServices方法中添加UEditorNetCore服务" class="headerlink" title="2.在Startup.cs的ConfigureServices方法中添加UEditorNetCore服务"></a>2.在Startup.cs的ConfigureServices方法中添加UEditorNetCore服务</h3><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ConfigureServices</span>(<span class="params">IServiceCollection services</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">　　<span class="comment">//第一个参数为配置文件路径，默认为项目目录下config.json</span></span><br><span class="line">　　<span class="comment">//第二个参数为是否缓存配置文件，默认false</span></span><br><span class="line">　　services.AddUEditorService()</span><br><span class="line">　　services.AddMvc();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -520,8 +520,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2018/03/20/start/" rel="prev" title="决定开始写个人博客了">
-                决定开始写个人博客了 <i class="fa fa-chevron-right"></i>
+              <a href="/2017/03/01/地狱训练第一章练习1半音阶练习/" rel="prev" title="地狱训练第一章练习1半音阶练习">
+                地狱训练第一章练习1半音阶练习 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -634,7 +634,7 @@ var jiathis_config={
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">27</span>
+                  <span class="site-state-item-count">28</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -645,7 +645,7 @@ var jiathis_config={
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -656,7 +656,7 @@ var jiathis_config={
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-count">30</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>

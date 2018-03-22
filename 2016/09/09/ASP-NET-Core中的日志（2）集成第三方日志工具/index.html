@@ -89,20 +89,20 @@
 <meta property="og:url" content="http://durow.vip/2016/09/09/ASP-NET-Core中的日志（2）集成第三方日志工具/index.html">
 <meta property="og:site_name" content="Durow&#39;s corner">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://durow.vip/images/2016/0907/201609070000.png">
-<meta property="og:image" content="http://durow.vip/images/2016/0909/201609090001.png">
-<meta property="og:image" content="http://durow.vip/images/2016/0909/201609090002.png">
-<meta property="og:image" content="http://durow.vip/images/2016/0909/201609090003.png">
-<meta property="og:image" content="http://durow.vip/images/2016/0909/201609090004.png">
-<meta property="og:image" content="http://durow.vip/images/2016/0909/201609090005.png">
-<meta property="og:image" content="http://durow.vip/images/2016/0909/201609090101.png">
-<meta property="og:image" content="http://durow.vip/images/2016/0909/201609090102.png">
-<meta property="og:image" content="http://durow.vip/images/2016/0909/201609090103.png">
-<meta property="og:image" content="http://durow.vip/images/2016/0909/201609090104.png">
-<meta property="og:updated_time" content="2018-03-21T06:00:34.955Z">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0907/201609070000.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0909/201609090001.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0909/201609090002.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0909/201609090003.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0909/201609090004.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0909/201609090005.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0909/201609090101.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0909/201609090102.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0909/201609090103.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0909/201609090104.png">
+<meta property="og:updated_time" content="2018-03-22T06:38:50.734Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ASP.NET Core中的日志（2）集成第三方日志工具">
-<meta name="twitter:image" content="http://durow.vip/images/2016/0907/201609070000.png">
+<meta name="twitter:image" content="http://durow.gitee.io/source/images/2016/0907/201609070000.png">
 
 
 
@@ -426,31 +426,31 @@
       
 
       
-        <p><img src="/images/2016/0907/201609070000.png" alt="ASP.NET"></p>
+        <p><img src="http://durow.gitee.io/source/images/2016/0907/201609070000.png" alt="ASP.NET"></p>
 <a id="more"></a>
 <h2 id="0x00-在-NetCore的Logging组件中集成NLog"><a href="#0x00-在-NetCore的Logging组件中集成NLog" class="headerlink" title="0x00 在.NetCore的Logging组件中集成NLog"></a>0x00 在.NetCore的Logging组件中集成NLog</h2><p>上一篇讨论了.NetCore中日志框架的结构，这一篇讨论一下.NetCore的Logging组件中第三方日志工具的集成。只要按照Logging组件中相关接口的要求提供相应的实现（ILogger、ILoggerProvider），然后把实现的ILoggerProvider加入到LoggerFactory就可以使用了，非常方便。这里以NLog为例进行实践。关于NLog的详细教程可以参考<a href="https://github.com/NLog/NLog/wiki" target="_blank" rel="noopener">https://github.com/NLog/NLog/wiki</a>，园子里也很多这方面的文章。这里主要说集成原理。</p>
 <p>NLog本身提供了一套完整的日志记录框架，由NLog.Logger实现日志记录，通过配置文件或代码配置路由规则（rules）把不同name的Logger路由到不同的输出目标（target）上。</p>
-<p><img src="/images/2016/0909/201609090001.png" alt="01"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/0909/201609090001.png" alt="01"></p>
 <p>NLog集成到Logging组件中，一般不会做过多的配置，只是把Log方法的内容转发到NLog中处理。日志过滤（NLog中叫路由）和输出格式配置都在NLog中配置，Logging组件仅仅起到一个日志内容转发的作用。</p>
 <p>NLog的Logger在集成到.NetCore的Logging组件中时需要做以下事情：</p>
 <h3 id="1、包装NLog-Logger为NLogLogger，并实现ILogger接口。"><a href="#1、包装NLog-Logger为NLogLogger，并实现ILogger接口。" class="headerlink" title="1、包装NLog.Logger为NLogLogger，并实现ILogger接口。"></a>1、包装NLog.Logger为NLogLogger，并实现ILogger接口。</h3><p>把NLog.Logger包装为NlogLogger，实现ILogger接口。在实现Log方法时把Logging组件中Log方法的参数转化为NLog.Logger中Log方法的参数，然后调用NLog.Logger的Log方法输出日志。</p>
-<p><img src="/images/2016/0909/201609090002.png" alt="02"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/0909/201609090002.png" alt="02"></p>
 <p>此外，在NLog中是有自己的日志等级的，因此在记录日志时需要把.NetCore的Logging组件中定义的日志等级转换为NLog中的日志等级。</p>
-<p><img src="/images/2016/0909/201609090003.png" alt="03"></p>
-<h3 id="2、实现ILoggerProvider接口"><a href="#2、实现ILoggerProvider接口" class="headerlink" title="2、实现ILoggerProvider接口"></a>2、实现ILoggerProvider接口</h3><p><img src="/images/2016/0909/201609090004.png" alt="04"></p>
-<h3 id="3、添加扩展方法方便把ILoggerProvider加入到LoggerFactory中。"><a href="#3、添加扩展方法方便把ILoggerProvider加入到LoggerFactory中。" class="headerlink" title="3、添加扩展方法方便把ILoggerProvider加入到LoggerFactory中。"></a>3、添加扩展方法方便把ILoggerProvider加入到LoggerFactory中。</h3><p><img src="/images/2016/0909/201609090005.png" alt="05"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/0909/201609090003.png" alt="03"></p>
+<h3 id="2、实现ILoggerProvider接口"><a href="#2、实现ILoggerProvider接口" class="headerlink" title="2、实现ILoggerProvider接口"></a>2、实现ILoggerProvider接口</h3><p><img src="http://durow.gitee.io/source/images/2016/0909/201609090004.png" alt="04"></p>
+<h3 id="3、添加扩展方法方便把ILoggerProvider加入到LoggerFactory中。"><a href="#3、添加扩展方法方便把ILoggerProvider加入到LoggerFactory中。" class="headerlink" title="3、添加扩展方法方便把ILoggerProvider加入到LoggerFactory中。"></a>3、添加扩展方法方便把ILoggerProvider加入到LoggerFactory中。</h3><p><img src="http://durow.gitee.io/source/images/2016/0909/201609090005.png" alt="05"></p>
 <p>有一点需要注意，NLog官方给出的示例（<a href="https://github.com/NLog/NLog.Extensions.Logging" target="_blank" rel="noopener">https://github.com/NLog/NLog.Extensions.Logging</a>）还是像以往一样在类中调用</p>
 <figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LogManager.GetCurrentClassLogger();</span><br></pre></td></tr></table></figure>
 <p>方法获取Logger，这是不科学的，实际使用中还是应该通过依赖注入的方式获取Logger。通过在构造函数参数中注入ILogger<class>()的方式获取Logger，与在Class中调用GetCurrentClassLogger()方法获取的Logger的Name是相同的，都可以正常在NLog配置文件中匹配路由规则。</class></p>
 <h2 id="0x01-集成自己的日志工具"><a href="#0x01-集成自己的日志工具" class="headerlink" title="0x01 集成自己的日志工具"></a>0x01 集成自己的日志工具</h2><p>了解了.NetCore中Logging框架，我们也可以尝试自己写一个日志记录器并集成到Logging组件中。下面我们自己写一个往文本文档中记录日志的工具，以下内容只是用于演示，实际编写自己的日志记录工具需要更加严谨。</p>
 <p>首先需要实现ILogger接口，Log方法直接把传入的信息按格式输出到文本文件：</p>
-<p><img src="/images/2016/0909/201609090101.png" alt="11"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/0909/201609090101.png" alt="11"></p>
 <p>实现ILoggerProvider接口：</p>
-<p><img src="/images/2016/0909/201609090102.png" alt="12"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/0909/201609090102.png" alt="12"></p>
 <p>写一个扩展方法方便添加：</p>
-<p><img src="/images/2016/0909/201609090103.png" alt="13"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/0909/201609090103.png" alt="13"></p>
 <p>这样在Startup中我们就可以加入需要的所有Logger了，混合了原生的、第三方的、以及自己写的。</p>
-<p><img src="/images/2016/0909/201609090104.png" alt="14"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/0909/201609090104.png" alt="14"></p>
 <p>有兴趣看详细代码的可以到：</p>
 <p><a href="https://github.com/durow/NetCoreStudy/tree/master/src/LoggingStudy" target="_blank" rel="noopener">https://github.com/durow/NetCoreStudy/tree/master/src/LoggingStudy</a></p>
 <h2 id="0x02-写在最后"><a href="#0x02-写在最后" class="headerlink" title="0x02 写在最后"></a>0x02 写在最后</h2><p>关于.NetCore的Logging组件就写到这里了，Logging组件的设计很容易集成第三方日志工具。了解Logging组件如何实现对各个不同日志工具的集成对于实际开发中日志记录基本是没有帮助的:(，毕竟有如此丰富的选择，我们几乎不需要开发自己的日志记录工具。不过通过对Logging组件的学习，在软件的设计方面学到了很多。也体会到了书本上很多看似没事找事的设计模式在实际中的应用。</p>
@@ -647,7 +647,7 @@ var jiathis_config={
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">27</span>
+                  <span class="site-state-item-count">28</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -658,7 +658,7 @@ var jiathis_config={
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -669,7 +669,7 @@ var jiathis_config={
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-count">30</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>

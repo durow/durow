@@ -83,25 +83,23 @@
 
 
 
-<meta name="description" content="0x00 起因">
 <meta name="keywords" content="UWP,WindowsPhone">
 <meta property="og:type" content="article">
 <meta property="og:title" content="UWP中实现自定义标题栏">
 <meta property="og:url" content="http://durow.vip/2015/10/21/UWP中实现自定义标题栏/index.html">
 <meta property="og:site_name" content="Durow&#39;s corner">
-<meta property="og:description" content="0x00 起因">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://durow.vip/images/2015/1021/201510210101.png">
-<meta property="og:image" content="http://durow.vip/images/2015/1021/201510210201.png">
-<meta property="og:image" content="http://durow.vip/images/2015/1021/201510210202.png">
-<meta property="og:image" content="http://durow.vip/images/2015/1021/201510210203.png">
-<meta property="og:image" content="http://durow.vip/images/2015/1021/201510210204.png">
-<meta property="og:image" content="http://durow.vip/images/2015/1021/201510210205.png">
-<meta property="og:updated_time" content="2018-03-21T09:05:36.659Z">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/1021/201510210000.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/1021/201510210101.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/1021/201510210201.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/1021/201510210202.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/1021/201510210203.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/1021/201510210204.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/1021/201510210205.png">
+<meta property="og:updated_time" content="2018-03-22T06:38:50.758Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="UWP中实现自定义标题栏">
-<meta name="twitter:description" content="0x00 起因">
-<meta name="twitter:image" content="http://durow.vip/images/2015/1021/201510210101.png">
+<meta name="twitter:image" content="http://durow.gitee.io/source/images/2015/1021/201510210000.jpg">
 
 
 
@@ -414,12 +412,13 @@
       
 
       
-        <h2 id="0x00-起因"><a href="#0x00-起因" class="headerlink" title="0x00 起因"></a>0x00 起因</h2><a id="more"></a>
-<p>在UWP开发中，有时候我们希望实现自定义标题栏，例如在标题栏中加入搜索框、按钮之类的控件。搜了下资料居然在一个日文网站找到了一篇介绍这个主题的文章：</p>
+        <p><img src="http://durow.gitee.io/source/images/2015/1021/201510210000.jpg" alt="UWPTitle"></p>
+<a id="more"></a>
+<h2 id="0x00-起因"><a href="#0x00-起因" class="headerlink" title="0x00 起因"></a>0x00 起因</h2><p>在UWP开发中，有时候我们希望实现自定义标题栏，例如在标题栏中加入搜索框、按钮之类的控件。搜了下资料居然在一个日文网站找到了一篇介绍这个主题的文章：</p>
 <p><a href="http://www.atmarkit.co.jp/ait/articles/1510/14/news022.html" target="_blank" rel="noopener">http://www.atmarkit.co.jp/ait/articles/1510/14/news022.html</a></p>
 <p>看了下本想着翻译过来分享，但有些地方说的不是特别明确，所以自己实现了下，结合自己的体会总结了这篇文章。</p>
 <h2 id="0x01-UWP中的标题栏"><a href="#0x01-UWP中的标题栏" class="headerlink" title="0x01 UWP中的标题栏"></a>0x01 UWP中的标题栏</h2><p>一个普通的UWP窗口如下图所示：</p>
-<p><img src="/images/2015/1021/201510210101.png" alt="UWPTitle"></p>
+<p><img src="http://durow.gitee.io/source/images/2015/1021/201510210101.png" alt="UWPTitle"></p>
 <p>我们可以通过两种方式获取不同的标题栏对象，不同对象操作侧重点不同。</p>
 <figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> coreTitleBar = Windows.ApplicationModel.Core.CoreApplication.GetCurrentView().TitleBar;</span><br></pre></td></tr></table></figure>
 <p>这种方式获取的是一个CoreApplicationViewTitleBar对象，主要控制标题栏扩展等相关功能。后面的coreTitleBar指的就是这个对象。</p>
@@ -428,19 +427,19 @@
 <p>我们自定义标题栏时这两个对象都会用到。</p>
 <h2 id="0x02-实现自定义标题栏"><a href="#0x02-实现自定义标题栏" class="headerlink" title="0x02 实现自定义标题栏"></a>0x02 实现自定义标题栏</h2><p>coreTitleBar中有一个属性为ExtendViewIntoTitleBar，将其设置为true就允许将我们在窗体中用XAML定义的视图扩展至标题栏区域</p>
 <p>coreTitleBar.ExtendViewIntoTitleBar = true;<br>这个设置后标题栏原有的地方就消失了，我们定义的试图扩展了过去，如下图所示：</p>
-<p><img src="/images/2015/1021/201510210201.png" alt="UWPTitle"></p>
+<p><img src="http://durow.gitee.io/source/images/2015/1021/201510210201.png" alt="UWPTitle"></p>
 <p>看上去离我们的目标近了一些，标题栏消失了，我们在XAML中定义的Grid上移占据了原有标题栏的位置，原有的appTitleBar上的最大化、最小化、关闭按钮都可用。如果只是一副图片扩展至标题栏用作背景的话貌似可以了，不过我们希望在标题栏上加个搜索栏，所以还是存在几个问题的：</p>
 <p>首先就是appTitleBar的背景色不协调。</p>
 <p>要解决这个问题，我们需要把appTitleBar上按钮的背景色设置为透明：</p>
 <figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">appTitleBar.ButtonBackgroundColor = Colors.Transparent;</span><br></pre></td></tr></table></figure>
 <p>设置后窗体就变成这样了：</p>
-<p><img src="/images/2015/1021/201510210202.png" alt="UWPTitle"> </p>
+<p><img src="http://durow.gitee.io/source/images/2015/1021/201510210202.png" alt="UWPTitle"> </p>
 <p>按钮背景色变成了透明，但系统标题栏上的按钮和我们自定义标题栏上的搜索框重叠了。要解决这个问题我们可以利用coreTitleBar上的属性SystemOverlayLeftInset和SystemOverlayRightInset，分别表示了coreTitleBar嵌入时的左边距和右边距，我们可以通过设置自定义标题栏的Padding属性达到目的：</p>
 <figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//TitleBar为我们自己的标题栏</span></span><br><span class="line">TitleBar.Height = coreTitleBar.Height;</span><br><span class="line">TitleBar.Padding = <span class="keyword">new</span> Thickness(</span><br><span class="line">    coreTitleBar.SystemOverlayLeftInset,</span><br><span class="line">    <span class="number">0</span>,</span><br><span class="line">    coreTitleBar.SystemOverlayRightInset,</span><br><span class="line">    <span class="number">0</span> );</span><br></pre></td></tr></table></figure>
 <p>那么在什么时候进行这个设置比较好呢，coreTitleBar有一个事件叫做LayoutMetricsChanged，当页面布局发生变化时触发，例如屏幕旋转导致页面重新布局就会触发这个事件。我们可以吧标题栏Padding属性的设置放在这个事件里。设置好后运行程序标题栏如下图所示：</p>
-<p><img src="/images/2015/1021/201510210203.png" alt="UWPTitle"></p>
+<p><img src="http://durow.gitee.io/source/images/2015/1021/201510210203.png" alt="UWPTitle"></p>
 <p>这样似乎好多了，但是当我想在搜索栏输入点内容时发现根本点不进去啊，放大镜按钮也没法点，按住搜索栏还能拖动窗口，看来是我们自己的标题栏被系统标题栏遮挡在下面了。</p>
-<p><img src="/images/2015/1021/201510210204.png" alt="UWPTitle"></p>
+<p><img src="http://durow.gitee.io/source/images/2015/1021/201510210204.png" alt="UWPTitle"></p>
 <p>大概就是上图这么一种感觉。</p>
 <p>对于这个问题，我们可以使用Window对象中的SetTitleBar()方法只把文字区域设置为标题栏：</p>
 <figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Window.Current.SetTitleBar(TitleText);</span><br></pre></td></tr></table></figure>
@@ -448,7 +447,7 @@
 <p>另外我还考虑了一种方式就是重叠两层Grid，底层通过SetTitleBar设置为标题栏，放置不需要接收输入的控件如文本、图片等，上层放置需要接收输入的控件，如TextBox等，不过没有实际测试。</p>
 <p>除此之外还可以考虑给标题栏加入返回按钮，按钮调用Frame.GoBack()方法，根据Frame.CanGoBack属性决定返回按钮是否显示。这个也很容易实现，就不作说明了。</p>
 <p>程序最后运行效果如图所示，其中手机终端本身就不显示标题栏</p>
-<p><img src="/images/2015/1021/201510210205.png" alt="UWPTitle"></p>
+<p><img src="http://durow.gitee.io/source/images/2015/1021/201510210205.png" alt="UWPTitle"></p>
 <h2 id="0x03-相关下载"><a href="#0x03-相关下载" class="headerlink" title="0x03 相关下载"></a>0x03 相关下载</h2><p><a href="https://github.com/durow/TestArea/tree/master/UWPTest/TitleBarTest" target="_blank" rel="noopener">https://github.com/durow/TestArea/tree/master/UWPTest/TitleBarTest</a></p>
 
       
@@ -639,7 +638,7 @@ var jiathis_config={
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">27</span>
+                  <span class="site-state-item-count">28</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -650,7 +649,7 @@ var jiathis_config={
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -661,7 +660,7 @@ var jiathis_config={
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-count">30</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>

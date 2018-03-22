@@ -83,21 +83,19 @@
 
 
 
-<meta name="description" content="0x00 写在开始">
 <meta name="keywords" content="ASP.NET Core,离线环境">
 <meta property="og:type" content="article">
 <meta property="og:title" content="在离线环境中使用ASP.NET Core">
 <meta property="og:url" content="http://durow.vip/2016/07/18/在离线环境中使用ASP-NET-Core/index.html">
 <meta property="og:site_name" content="Durow&#39;s corner">
-<meta property="og:description" content="0x00 写在开始">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://durow.vip/images/2016/0718/201607180101.png">
-<meta property="og:image" content="http://durow.vip/images/2016/0718/201607180301.png">
-<meta property="og:updated_time" content="2018-03-21T08:18:30.853Z">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0718/201607180000.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0718/201607180101.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0718/201607180301.png">
+<meta property="og:updated_time" content="2018-03-22T06:38:50.809Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="在离线环境中使用ASP.NET Core">
-<meta name="twitter:description" content="0x00 写在开始">
-<meta name="twitter:image" content="http://durow.vip/images/2016/0718/201607180101.png">
+<meta name="twitter:image" content="http://durow.gitee.io/source/images/2016/0718/201607180000.jpg">
 
 
 
@@ -410,8 +408,9 @@
       
 
       
-        <h2 id="0x00-写在开始"><a href="#0x00-写在开始" class="headerlink" title="0x00 写在开始"></a>0x00 写在开始</h2><a id="more"></a>
-<p>很早开始就对.NET Core比较关注，一改微软之前给人的印象，变得轻量、开源、跨平台。最近打算试着在工作中使用。但工作是在与互联网完全隔离的网络中进行的，因此就开始了在离线环境中部署.NET Core开发环境的尝试。总的来说还是比较蛋疼的，几乎每个阶段都遇到了问题。不过还好最后搞定了，写下这篇博客做个记录，同时分享给有类似需求的童鞋。以下都是亲测有效。</p>
+        <p><img src="http://durow.gitee.io/source/images/2016/0718/201607180000.jpg" alt="OffLine"></p>
+<a id="more"></a>
+<h2 id="0x00-写在开始"><a href="#0x00-写在开始" class="headerlink" title="0x00 写在开始"></a>0x00 写在开始</h2><p>很早开始就对.NET Core比较关注，一改微软之前给人的印象，变得轻量、开源、跨平台。最近打算试着在工作中使用。但工作是在与互联网完全隔离的网络中进行的，因此就开始了在离线环境中部署.NET Core开发环境的尝试。总的来说还是比较蛋疼的，几乎每个阶段都遇到了问题。不过还好最后搞定了，写下这篇博客做个记录，同时分享给有类似需求的童鞋。以下都是亲测有效。</p>
 <h2 id="0x01安装VS2015-Update3"><a href="#0x01安装VS2015-Update3" class="headerlink" title="0x01安装VS2015 Update3"></a>0x01安装VS2015 Update3</h2><p>开发.NET Core可以使用VS2015和VS Code。在这里先讨论VS2015的情况，毕竟如果在Windows下开发，VS2015功能上还是要强太多。.NET Core Web Tools必须要VS2015 Update3以上，也就是首先要在内网安装VS2015 Update3。我刚开始的方式是从官网下载光盘镜像，然后安装。但这样大多数情况下是无法安装的。会提示“安装包丢失或损坏”，之前装VS2015时可以选择跳过文件，装完后也能用（至少WPF没问题），但从VS2015 Update2开始，有些安装包无法选择跳过，只能退出安装。</p>
 <p>之所以提示安装包损坏，是因为系统中缺少</p>
 <ul>
@@ -423,7 +422,7 @@
 <ul>
 <li>1.找一台正常装了VS2015的电脑，Win+R打开运行，输入certmgr.msc，打开证书管理界面。</li>
 </ul>
-<p><img src="/images/2016/0718/201607180101.png" alt="OffLine"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/0718/201607180101.png" alt="OffLine"></p>
 <ul>
 <li><p>2.在受信任的根证书颁发机构中找到缺少的两项。按照默认方式导出（不知道为什么我这台电脑上有重复）。</p>
 </li>
@@ -438,7 +437,7 @@
 <p><code>DotNetCore.1.0.0-VS2015Tools.Preview2.exe /layout</code></p>
 <p>即可把安装文件下载到相同目录下packages文件夹里，其中也包含了.Net Core SDK。比较惨的是我的内网电脑装了某国产杀毒软件，每次一运行安装就提示我恶意操作然后强行中止安装，我又没权限关掉杀毒软件，所以只好在一个一个包手动装的，不过好在可以正常使用。因为离线环境总是缺这缺那的，如果安装过程中出现什么问题，只要查看错误log，然后解决就可以。</p>
 <h2 id="0x03-如何使用nuget"><a href="#0x03-如何使用nuget" class="headerlink" title="0x03 如何使用nuget"></a>0x03 如何使用nuget</h2><p>.NET Core的包依赖全都使用nuget，在线环境下自然是方便，离线环境下就稍麻烦一点了。在安装VS2015 Update3时，.NET Core所需的官方依赖包都已经安装在了（默认安装）C:\Program Files (x86)\Microsoft SDKs\NuGetPackages目录下，在nuget管理中也可以看到这是默认的离线包目录，我们需要什么样的包只要把它复制到这个目录，在nuget管理中的程序包源选择离线的源即可。</p>
-<p><img src="/images/2016/0718/201607180301.png" alt="Nuget"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/0718/201607180301.png" alt="Nuget"></p>
 <p>那么怎么获得离线安装包呢，我们在用nuget安装程序包时会在C:\Users{你的用户名}.nuget\packages目录进行缓存，只要找到缓存的包复制到离线环境，放到nuget离线目录即可。</p>
 <p>另外还有一种方式就是在内网架设nuget服务，这个也十分容易，</p>
 <p><a href="http://edi.wang/Post/2012/12/15/setup-private-nuget-server" target="_blank" rel="noopener">http://edi.wang/Post/2012/12/15/setup-private-nuget-server</a></p>
@@ -639,7 +638,7 @@ var jiathis_config={
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">27</span>
+                  <span class="site-state-item-count">28</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -650,7 +649,7 @@ var jiathis_config={
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -661,7 +660,7 @@ var jiathis_config={
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-count">30</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>

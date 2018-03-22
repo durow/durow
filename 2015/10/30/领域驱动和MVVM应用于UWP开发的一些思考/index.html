@@ -83,24 +83,22 @@
 
 
 
-<meta name="description" content="0x00 起因">
 <meta name="keywords" content="UWP,MVVM,领域驱动">
 <meta property="og:type" content="article">
 <meta property="og:title" content="领域驱动和MVVM应用于UWP开发的一些思考">
 <meta property="og:url" content="http://durow.vip/2015/10/30/领域驱动和MVVM应用于UWP开发的一些思考/index.html">
 <meta property="og:site_name" content="Durow&#39;s corner">
-<meta property="og:description" content="0x00 起因">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://durow.vip/images/2015/1030/201510300101.png">
-<meta property="og:image" content="http://durow.vip/images/2015/1030/201510300102.png">
-<meta property="og:image" content="http://durow.vip/images/2015/1030/201510300301.png">
-<meta property="og:image" content="http://durow.vip/images/2015/1030/201510300601.png">
-<meta property="og:image" content="http://durow.vip/images/2015/1030/201510300801.png">
-<meta property="og:updated_time" content="2018-03-21T08:51:22.983Z">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/1030/201510300000.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/1030/201510300101.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/1030/201510300102.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/1030/201510300301.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/1030/201510300601.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/1030/201510300801.png">
+<meta property="og:updated_time" content="2018-03-22T06:38:50.818Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="领域驱动和MVVM应用于UWP开发的一些思考">
-<meta name="twitter:description" content="0x00 起因">
-<meta name="twitter:image" content="http://durow.vip/images/2015/1030/201510300101.png">
+<meta name="twitter:image" content="http://durow.gitee.io/source/images/2015/1030/201510300000.jpg">
 
 
 
@@ -413,15 +411,16 @@
       
 
       
-        <h2 id="0x00-起因"><a href="#0x00-起因" class="headerlink" title="0x00 起因"></a>0x00 起因</h2><a id="more"></a>
-<p>有段时间没写博客了，其实最近本来是根据梳理的MSDN上的资料（UWP开发目录整理）有条不紊的进行UWP学习的。学习中有了心得体会或遇到了问题就写一篇博客记录一下，方便后面查询。不过前几天在园子里逛看了几篇领域驱动的文章，突然发现领域驱动设计的有些地方对我有了很大的提示。在之前用WPF做桌面开发时，使用MVVM可以把View和Model很好的解耦，但在处理数据持久化的时候并没有找到一种特别好的方式。我之前的做法是把ADO封装了一层SQLHelper用于处理数据库操作，解耦了数据库操作和具体数据库类型的依赖，当然了前提是数据库操作是基于ADO.NET实现的。对于返回的DataTable，DataSet等在Model的方法中转换为Model的实例。例如有一个对象是User，要从数据库中获取所有用户我一般是在User类中写一个静态方法，User.GetAll()，这个方法会使用SQLHelper执行SQL语句，获取DataTable，然后把DataTable转换成IEnumerable&lt;User&gt;并返回，这算是人肉ORM吧。为此我还写了个代码生成工具，把类中需要的属性和属性对应的数据库表字段名称、类型等信息设置好，可以直接生成代码实现映射，省去了手动输入的麻烦，不过能生成的数据库操作类型十分有限。但这样做存在的一个很大的问题就是Model变得十分臃肿。虽然领域驱动提倡用充血模型，但我那种Model应该算是过度充血了吧。而且以现在的观点来看，这种方式把基础层（数据库操作）、ORM（ADO对象映射为User对象）、Model紧紧的粘合在了一起，如果突然有一天跟我说数据操作必须用WebAPI，我能做的大概就是把之前的代码Ctrl+K+C，然后重新从WebAPI获取数据，然后从JSON映射到Model吧。如果说需要数据库和WebAPI混用，我的Model将会变得更加臃肿。</p>
+        <p><img src="http://durow.gitee.io/source/images/2015/1030/201510300000.jpg" alt="DDD"></p>
+<a id="more"></a>
+<h2 id="0x00-起因"><a href="#0x00-起因" class="headerlink" title="0x00 起因"></a>0x00 起因</h2><p>有段时间没写博客了，其实最近本来是根据梳理的MSDN上的资料（UWP开发目录整理）有条不紊的进行UWP学习的。学习中有了心得体会或遇到了问题就写一篇博客记录一下，方便后面查询。不过前几天在园子里逛看了几篇领域驱动的文章，突然发现领域驱动设计的有些地方对我有了很大的提示。在之前用WPF做桌面开发时，使用MVVM可以把View和Model很好的解耦，但在处理数据持久化的时候并没有找到一种特别好的方式。我之前的做法是把ADO封装了一层SQLHelper用于处理数据库操作，解耦了数据库操作和具体数据库类型的依赖，当然了前提是数据库操作是基于ADO.NET实现的。对于返回的DataTable，DataSet等在Model的方法中转换为Model的实例。例如有一个对象是User，要从数据库中获取所有用户我一般是在User类中写一个静态方法，User.GetAll()，这个方法会使用SQLHelper执行SQL语句，获取DataTable，然后把DataTable转换成IEnumerable&lt;User&gt;并返回，这算是人肉ORM吧。为此我还写了个代码生成工具，把类中需要的属性和属性对应的数据库表字段名称、类型等信息设置好，可以直接生成代码实现映射，省去了手动输入的麻烦，不过能生成的数据库操作类型十分有限。但这样做存在的一个很大的问题就是Model变得十分臃肿。虽然领域驱动提倡用充血模型，但我那种Model应该算是过度充血了吧。而且以现在的观点来看，这种方式把基础层（数据库操作）、ORM（ADO对象映射为User对象）、Model紧紧的粘合在了一起，如果突然有一天跟我说数据操作必须用WebAPI，我能做的大概就是把之前的代码Ctrl+K+C，然后重新从WebAPI获取数据，然后从JSON映射到Model吧。如果说需要数据库和WebAPI混用，我的Model将会变得更加臃肿。</p>
 <p>领域驱动设计通过Repository实现了业务领域和基础层的数据库操作之间低耦合，结合之前MVVM模式带来的View和Model的低耦合，又恰巧最近在学习UWP开发，所以有了把MVVM和DDD在UWP开发中实践的想法，于是也有了这篇文章。在这里需要说明的是我也是刚开始接触领域驱动，其中的很多概念还没有接触到，看的比较多的就是Repository，毕竟数据持久化是我之前的痛点。后面我也会把数据驱动相关书设置为我的床头书，打算认真看一下，可能随着学习和对领域驱动的了解有些想法会发生改变，有了新的体会后面也会写文章，这篇文章主要记录了这个时期我对领域驱动的粗浅理解，有不对的地方也希望多多指教。</p>
 <h2 id="0x01领域驱动和MVVM模式"><a href="#0x01领域驱动和MVVM模式" class="headerlink" title="0x01领域驱动和MVVM模式"></a>0x01领域驱动和MVVM模式</h2><p>我看到的关于领域驱动的文章很多都是讨论实践于ASP.NET MVC的，而且几乎都把ORM当作了必选项。而我大多数时间是做桌面开发的，所以看到领域驱动的第一反应是与MVVM模式的结合。那么MVVM和DDD有没有可能结合起来呢。</p>
-<p><img src="/images/2015/1030/201510300101.png" alt="DDD"></p>
+<p><img src="http://durow.gitee.io/source/images/2015/1030/201510300101.png" alt="DDD"></p>
 <p>MVVM核心的三个部分是Model、View、ViewModel，重点解决的是通过ViewModel实现Model和View的低耦合（MVVM模式解析和在WPF中的实现），但有一个问题是没有解决的，那就是业务逻辑和数据持久化要如何处理。有人认为业务逻辑应该放在ViewModel中，Model应该是POCO对象，用于数据显示，业务逻辑可以通过ViewModel和Service实现。在这种观点中Model更偏向于DTO的存在。还有一种认为业务应当聚合到Model之下，这样更OO一点，难以聚合到Model下的就写成Service，我就是属于这种观点的，甚至于Model相关的所有业务逻辑和数据操作也全都聚合到了Model下。</p>
 <p>而领域驱动注重的是业务领域这一层的分离，简直就是对MVVM的一种最好的补充。现在要再有人问MVVM中业务逻辑该放在哪里，我会毫不犹豫地告诉他业务逻辑要放在领域层。</p>
 <p>从分层的思想来看，领域驱动设计为四层架构，分别是表示层、应用层、领域层和基础层。</p>
-<p><img src="/images/2015/1030/201510300102.png" alt="DDD"></p>
+<p><img src="http://durow.gitee.io/source/images/2015/1030/201510300102.png" alt="DDD"></p>
 <p>接下来要讨论的领域驱动和MVVM的结合也是以领域驱动的这四层架构为基础的，把MVVM的三个核心概念融合到这四层架构中。下面我就结合MVVM谈一下自己对这几层的一些认识。</p>
 <h2 id="0x02-表示层和应用层"><a href="#0x02-表示层和应用层" class="headerlink" title="0x02 表示层和应用层"></a>0x02 表示层和应用层</h2><p>首先表示层这个是最明确的，就是用户看到的那一层。对于桌面应用来说就是窗口，对于Web应用来说就是HTML页面。对应于MVVM模式中的View。</p>
 <p>然后说下应用层，领域驱动设计认为应用层是非常薄的一层，应用层调用下面的领域层和基础层来实现功能。这个对于主张把业务逻辑聚合到Model下的我来说没什么违和感，在MVVM中，应用层对应的就是ViewModel。首先必须说明的是这里说的ViewModel和MVC中的ViewModel并不完全是一个概念，这两个ViewModel都是对View的抽象，但在MVC中引入ViewModel主要是为了与View对应，减少View的逻辑操作。这个ViewModel是对View中数据的抽象。在MVVM中ViewModel除了对View的数据抽象外还包含了对用户交互和功能等行为的抽象。例如MVVM中的ViewModel还需要处理用户的点击，输入等操作，MVVM中的ViewModel完全可以不包含业务细节，实现为很薄的一层。例如把大象放进冰箱大致分三步，ViewModel中的操作就是：</p>
@@ -430,7 +429,7 @@
 <p>在领域驱动设计的四层架构中，我们可以看到表示层是可以调用下面三层的，也就是说表示层可能对下面三层都会产生依赖。这样当表示层发生变化时下面三层中有的地方可能也需要做出改变，同样业务逻辑的一些变化可能也会影响到表示层。而在领域驱动中使用了MVVM模式后，表示层（View）依赖于ViewModel，对于ViewModel以下都不直接产生依赖。</p>
 <h3 id="0x03-领域层和基础层"><a href="#0x03-领域层和基础层" class="headerlink" title="0x03 领域层和基础层"></a>0x03 领域层和基础层</h3><p>View和ViewModel都找到了对应的层了，那Model对应哪一层呢。这个问题就不好回答了，这个得看对Model的理解了。如果把ViewModel看作很薄的一层应用层，Model使用贫血的POCO对象，那么这时候MVVM中的Model更偏向于DTO的存在，这时候在领域层需要有另外的聚合了数据和逻辑的模型。如果把MVVM中的Model看作数据和业务聚合的充血模型，那么这个Model可以当作业务领域中的Model，这时候如果需要的话可以考虑加入DTO。不过感觉这么考虑有点太教条了。我觉得可把领域层模型看作MVVM中的Model。</p>
 <p>基础层这个是MVVM中没有明显说明的。如果我们把领域层的模型看作MVVM中的Model那么基础层是直接可以拿来用的，不存在任何冲突。在尝试将MVVM和领域驱动结合后大概是下图这种感觉，表示层只依赖于应用层。</p>
-<p><img src="/images/2015/1030/201510300301.png" alt="DDD"></p>
+<p><img src="http://durow.gitee.io/source/images/2015/1030/201510300301.png" alt="DDD"></p>
 <h3 id="0x04-关于Repository"><a href="#0x04-关于Repository" class="headerlink" title="0x04 关于Repository"></a>0x04 关于Repository</h3><p>之所以把Repository拿出来单独说，就是因为领域驱动最开始吸引我的就是Repository很好的解决了MVVM中没有涉及到并且长期困扰我的数据持久化的问题。此外另一个原因是看到很多文章讨论Repository应该属于哪一层的问题，这其中包含了Repository接口的定义和实现等。这里我也谈一下我个人的一点看法。</p>
 <p>从领域驱动设计的四层架构中我们可以看到，领域层是依赖基础层的，而基础层并不依赖领域层，因为如果有两层是互相依赖的，那么分层就毫无意义了。这种依赖的具体表现是什么呢？最具体的表现就是基础层和领域层分别存放在不同的程序集中，领域层程序集引用基础层程序集，基础层可以在没有领域层的时候编译通过。基于这个结论来看Repository，Repository接口的定义和实现都是依赖于领域层实体模型的，这个是无法避免的，所以Repository无论接口的定义还是实现都应该放在领域层。实际上从访问数据库读取数据到最终转化为对象列表，这个过程跨越了基础层和领域层，这个过程中包含着两个关键动作，第一个是从数据库中读取数据库数据，第二个是把原始数据映射为领域层实体对象。其中第一个动作属于基础层，第二个动作属于领域层。具体到代码我个人的理解就是在领域层中不应该出现任何SQL语句以及明显的数据库相关的东西（例如SqlConnection）。根据这个理论来举例，读取Users表中的内容并获得User对象列表。在基础层中提供针对数据库的通用的操作，操作返回ADO对象，不依赖于领域层：</p>
 <figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> DataTable <span class="title">GetUserTable</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">string</span> SQL = “SELECT * FROM Users”;</span><br><span class="line">    Using(<span class="keyword">var</span> con = <span class="keyword">new</span> SqlConnection(ConnectionString))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">var</span> cmd = <span class="keyword">new</span> SqlCommand(sql,con);</span><br><span class="line">        <span class="keyword">var</span> da = <span class="keyword">new</span> SqlDataAdaptor(cmd);</span><br><span class="line">        <span class="keyword">var</span> dt = <span class="keyword">new</span> DataTable();</span><br><span class="line">        da.Fill(dt);</span><br><span class="line">        <span class="keyword">return</span> dt;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -440,7 +439,7 @@
 <p>之前看到有文章讨论把Repository接口定义放在领域层，接口实现放在基础层，这个是不符合领域驱动的四层架构设计的。因为基础层中对Repository的实现依赖了领域层。但如果不纠结于这个四层架构，或者说在实际项目中领域层和基础层不需要分别放到单独的程序集中，这么做也是可以的，而且这么做领域层会显得更“纯净”，毕竟从数据库到实体的映射不能算业务逻辑。还是那句话，模式和设计是一种通用的指导方向，最终还是要服务于特定场景，没有绝对的对错，只有合适不合适。</p>
 <h2 id="0x05-引入ORM后的问题"><a href="#0x05-引入ORM后的问题" class="headerlink" title="0x05 引入ORM后的问题"></a>0x05 引入ORM后的问题</h2><p>ORM的作用就是把具体的数据库操作从业务逻辑中抽取出来，编写业务逻辑时不需要再考虑具体的数据库操作，把基础层和领域层的功能封装到了一起，这和Repository作用十分类似，可以说ORM是Repository的一个子集。这看上去似乎是很好的，在数据库操作时直接使用ORM来代替Repository就可以了。但实际中存在的最大问题是ORM返回的实体对象是对数据库表的抽象，一般是POCO对象，而Repository中返回的领域层对象是聚合根，聚合根和ORM返回的实体对象不一定是完全对应的，而且领域层对象是充血的。在某些情况下ORM返回的实体对象可以直接拿来作为领域层对象使用，这自然是好的，但当不能直接使用时就需要转换为领域层对象或对ORM返回的实体对象进行功能上的扩展。</p>
 <h2 id="0x06-以上理论在UWP中的实践"><a href="#0x06-以上理论在UWP中的实践" class="headerlink" title="0x06 以上理论在UWP中的实践"></a>0x06 以上理论在UWP中的实践</h2><p>思考了一大堆理论连我自己都信了，但实践才是检验真理的唯一标准。所以我打算新建一个测试用的UWP应用检验一下。记得学习MVVM那会，要用MVVM开发我一般会新建一个项目，然后建三个文件夹：View，Model，ViewModel，但为了能充分体验那种低耦合和单项依赖的感觉，我曾在一个解决方案中建了三个项目，分别叫View、ViewModel和Model，其中View引用ViewModel，ViewModel引用Model(虽然在View最后生成的文件夹中我们看到了Model的dll，但View并不直接依赖Model)。项目是不能互相引用的，也就是单向的依赖。所以这次在检验自己理论时，我仍然用了这个方法，根据领域驱动四层架构的依赖关系，在一个解决方案中建了四个项目：View（表示层），ViewModel（应用层），Domain（领域层），Infrastructure（基础层），其中Domain中有个Model文件夹存放领域模型，也是MVVM中的Model。VS解决方案中项目的排列是按照字母顺序的，所以项目存在的顺序并不代表他们之间的依赖关系。</p>
-<p><img src="/images/2015/1030/201510300601.png" alt="DDD"></p>
+<p><img src="http://durow.gitee.io/source/images/2015/1030/201510300601.png" alt="DDD"></p>
 <p>这样MVVM和DDD中的几大样算是全了，可以开始了。计划是做一个类似记事本一样的东西，可以添加标题，内容，并进行分类。应用会记录添加时间和最后编辑时间。业务逻辑简单，需要数据库操作，所以看了下UWP的数据库操作，然后就被啪啪啪打脸了。</p>
 <p>UWP貌似只支持SQLite本地数据库，不过SQLite也行啊，反正下几个dll引用一下，数据库操作封装到Infrastructure，实体映射封装到Domain的Repository，有强大的理论武器，怕什么。结果看了下UWP中的SQLite操作然后就脸肿了，UWP中SQLite数据库操作不是基于ADO.NET实现的，微软自己包装了一套叫SQLitePCL，实在太简单易用了。两行代码就执行完数据库操作，但获取的数据并不是DataSet或DataTable那种数据列表，只能获取SQLite对象然后一行一行读取数据，或者自己封装成DataTable那样的对象，返回到领域层，再由领域层映射为领域层对象。我是有多蛋疼才会那么做啊！好吧我真的那么做了，只是为了试一下分层，以后UWP开发中绝对不会第二次这么做了。以后在需要SQLite数据库操作时直接在领域层中获取数据并映射成领域实体对象，好吧，在领域层中出现了SQL语句，这脸打的，不过我有法宝:任何设计都要看场景！UWP中真的没有必要把数据库操作放到基础层，可以把UWP中的SQLite看作已经封装好了的基础层的功能，就差一条SQL语句当参数了。当然UWP上也有比较成熟的ORM工具，不过我没有使用。</p>
 <h2 id="0x07-实践后的想法"><a href="#0x07-实践后的想法" class="headerlink" title="0x07 实践后的想法"></a>0x07 实践后的想法</h2><p>果然实践出真知。</p>
@@ -449,7 +448,7 @@
 <p>第一次写这么长的文章，感觉想说的东西很多，不知道该怎么写，写作能力太差啊。写了3个多小时感觉乱七八糟的也不知道有没有说明白，好吧，反正我自己是越写越明白了。最后还有一点感受就是虽然红轴比较轻，打字时间长了手也会酸啊。</p>
 <h2 id="0x08-相关下载"><a href="#0x08-相关下载" class="headerlink" title="0x08 相关下载"></a>0x08 相关下载</h2><p><a href="https://github.com/durow/TestArea/tree/master/UWPDDD" target="_blank" rel="noopener">https://github.com/durow/TestArea/tree/master/UWPDDD</a></p>
 <p>示例还没有写完，不过大概框架有了。还需要边学习边完善。</p>
-<p><img src="/images/2015/1030/201510300801.png" alt="DDD"> </p>
+<p><img src="http://durow.gitee.io/source/images/2015/1030/201510300801.png" alt="DDD"> </p>
 
       
     </div>
@@ -641,7 +640,7 @@ var jiathis_config={
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">27</span>
+                  <span class="site-state-item-count">28</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -652,7 +651,7 @@ var jiathis_config={
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -663,7 +662,7 @@ var jiathis_config={
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-count">30</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>

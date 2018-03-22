@@ -83,18 +83,17 @@
 
 
 
-<meta name="description" content="0x00 写在开始">
 <meta name="keywords" content="ASP.NET Core,离线环境,发布">
 <meta property="og:type" content="article">
 <meta property="og:title" content="在离线环境中发布ASP.NET Core至Windows Server 2008">
 <meta property="og:url" content="http://durow.vip/2016/08/12/在离线环境中发布ASP-NET-Core至Windows-Server-2008/index.html">
 <meta property="og:site_name" content="Durow&#39;s corner">
-<meta property="og:description" content="0x00 写在开始">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-03-21T08:42:07.551Z">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0812/201608120000.jpg">
+<meta property="og:updated_time" content="2018-03-22T06:38:50.810Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="在离线环境中发布ASP.NET Core至Windows Server 2008">
-<meta name="twitter:description" content="0x00 写在开始">
+<meta name="twitter:image" content="http://durow.gitee.io/source/images/2016/0812/201608120000.jpg">
 
 
 
@@ -418,8 +417,9 @@
       
 
       
-        <h2 id="0x00-写在开始"><a href="#0x00-写在开始" class="headerlink" title="0x00 写在开始"></a>0x00 写在开始</h2><a id="more"></a>
-<p>之前一篇博客中写了<a href="/2016/07/18/在离线环境中使用ASP-NET-Core/">在离线环境中使用.NET Core</a>，之后一边学习一边写了一些页面作为测试，现在打算发布一下试试。看了下官方给出的发布教程感觉挺详细的了:<br><a href="https://docs.asp.net/en/latest/publishing/iis.html" target="_blank" rel="noopener">https://docs.asp.net/en/latest/publishing/iis.html</a><br>不过毕竟离线环境还是挺麻烦的，直觉告诉我发布过程中会遇到幺蛾子。果然就遇到问题了，不过解决起来都很简单。这里做个记录顺便分享下，希望对有类似需求的同学有所帮助。</p>
+        <p><img src="http://durow.gitee.io/source/images/2016/0812/201608120000.jpg" alt="ASP.NET"></p>
+<a id="more"></a>
+<h2 id="0x00-写在开始"><a href="#0x00-写在开始" class="headerlink" title="0x00 写在开始"></a>0x00 写在开始</h2><p>之前一篇博客中写了<a href="/2016/07/18/在离线环境中使用ASP-NET-Core/">在离线环境中使用.NET Core</a>，之后一边学习一边写了一些页面作为测试，现在打算发布一下试试。看了下官方给出的发布教程感觉挺详细的了:<br><a href="https://docs.asp.net/en/latest/publishing/iis.html" target="_blank" rel="noopener">https://docs.asp.net/en/latest/publishing/iis.html</a><br>不过毕竟离线环境还是挺麻烦的，直觉告诉我发布过程中会遇到幺蛾子。果然就遇到问题了，不过解决起来都很简单。这里做个记录顺便分享下，希望对有类似需求的同学有所帮助。</p>
 <h2 id="0x01-遇到的问题和解决方法"><a href="#0x01-遇到的问题和解决方法" class="headerlink" title="0x01 遇到的问题和解决方法"></a>0x01 遇到的问题和解决方法</h2><p>看了官方发布教程，首先去<a href="https://www.microsoft.com/net/download" target="_blank" rel="noopener">https://www.microsoft.com/net/download</a>下载服务端安装包，下载后复制到离线网络服务器上安装。结果遇到了问题1：</p>
 <h3 id="问题1：安装程序可以打开，但安装过程中提示未知错误，安装失败。（可惜离线网络也没法截图）"><a href="#问题1：安装程序可以打开，但安装过程中提示未知错误，安装失败。（可惜离线网络也没法截图）" class="headerlink" title="问题1：安装程序可以打开，但安装过程中提示未知错误，安装失败。（可惜离线网络也没法截图）"></a>问题1：安装程序可以打开，但安装过程中提示未知错误，安装失败。（可惜离线网络也没法截图）</h3><p>解决过程：看了下日志应该是安装某个组件过程中返回了错误而失败。我之前曾经过单独安装.NET Core SDK，也是失败，查看日志是缺少Microsoft Visual C++ 2015 Redistributable，装上就可以了。服务程序安装包也会安装.NET Core SDK，应该也是需要Microsoft Visual C++ 2015 Redistributable，于是从VS2015安装镜像里找出了64位安装包（下载地址：<br><a href="https://www.microsoft.com/en-us/download/details.aspx?id=48145" target="_blank" rel="noopener">https://www.microsoft.com/en-us/download/details.aspx?id=48145</a>），结果安装时又遇到了问题2：</p>
 <h3 id="问题2：安装Microsoft-Visual-C-2015-Redistributable时提示安装包无法验证。"><a href="#问题2：安装Microsoft-Visual-C-2015-Redistributable时提示安装包无法验证。" class="headerlink" title="问题2：安装Microsoft Visual C++ 2015 Redistributable时提示安装包无法验证。"></a>问题2：安装Microsoft Visual C++ 2015 Redistributable时提示安装包无法验证。</h3><p>解决过程：这个问题在之前离线安装VS2015时就遇到过了，解决起来轻车熟路，把缺少的两个证书导入就OK了。详细可以看在离线环境中使用.NET Core。</p>
@@ -628,7 +628,7 @@ var jiathis_config={
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">27</span>
+                  <span class="site-state-item-count">28</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -639,7 +639,7 @@ var jiathis_config={
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -650,7 +650,7 @@ var jiathis_config={
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-count">30</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>

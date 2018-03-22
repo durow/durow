@@ -83,32 +83,30 @@
 
 
 
-<meta name="description" content="0x00 问题来源">
 <meta name="keywords" content="ASP.NET Core,MVC,认证管理">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ASP.NET Core中的认证管理解析">
 <meta property="og:url" content="http://durow.vip/2016/08/18/ASP-NET-Core中的认证管理解析/index.html">
 <meta property="og:site_name" content="Durow&#39;s corner">
-<meta property="og:description" content="0x00 问题来源">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://durow.vip/images/2016/0818/201608180101.png">
-<meta property="og:image" content="http://durow.vip/images/2016/0818/201608180102.png">
-<meta property="og:image" content="http://durow.vip/images/2016/0818/201608180201.png">
-<meta property="og:image" content="http://durow.vip/images/2016/0818/201608180202.png">
-<meta property="og:image" content="http://durow.vip/images/2016/0818/201608180203.png">
-<meta property="og:image" content="http://durow.vip/images/2016/0818/201608180204.png">
-<meta property="og:image" content="http://durow.vip/images/2016/0818/201608180301.png">
-<meta property="og:image" content="http://durow.vip/images/2016/0818/201608180302.png">
-<meta property="og:image" content="http://durow.vip/images/2016/0818/201608180401.png">
-<meta property="og:image" content="http://durow.vip/images/2016/0818/201608180402.png">
-<meta property="og:image" content="http://durow.vip/images/2016/0818/201608180403.png">
-<meta property="og:image" content="http://durow.vip/images/2016/0818/201608180404.png">
-<meta property="og:image" content="http://durow.vip/images/2016/0818/201608180405.png">
-<meta property="og:updated_time" content="2018-03-21T06:51:53.800Z">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0818/201608180000.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0818/201608180101.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0818/201608180102.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0818/201608180201.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0818/201608180202.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0818/201608180203.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0818/201608180204.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0818/201608180301.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0818/201608180302.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0818/201608180401.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0818/201608180402.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0818/201608180403.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0818/201608180404.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0818/201608180405.png">
+<meta property="og:updated_time" content="2018-03-22T06:38:50.735Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ASP.NET Core中的认证管理解析">
-<meta name="twitter:description" content="0x00 问题来源">
-<meta name="twitter:image" content="http://durow.vip/images/2016/0818/201608180101.png">
+<meta name="twitter:image" content="http://durow.gitee.io/source/images/2016/0818/201608180000.jpg">
 
 
 
@@ -432,8 +430,9 @@
       
 
       
-        <h2 id="0x00-问题来源"><a href="#0x00-问题来源" class="headerlink" title="0x00 问题来源"></a>0x00 问题来源</h2><a id="more"></a>
-<p>在新建.NET Core的Web项目时选择“使用个人用户账户”就可以创建一个带有用户和权限管理的项目，已经准备好了用户注册、登录等很多页面，也可以使用AuthorizeAttribute进行各种权限管理，看起来似乎十分方便。不过生成的代码都替我干了些什么我一团雾水。看了下生成的数据表，功能也挺复杂的。实际上我需要的只是基于用户和角色的认证管理，而且用户资料是使用现有的库，但使用.NET Core自带的认证组件必须要依赖EF，表的结构也很多对不上，所以学习了下自带的认证组件的实现，然后自己写了个认证服务替换了Identity组件，同时Cookie管理使用自带的Cookie中间件、可以使用AuthorizeAttribute进行认证。复杂的需求还没遇到，所以就学习到了这里。这篇博客主要讨论最简单情况下的的基于用户和角色的认证。关于.NET Core自带认证组件的一些基本用法，可以参考<a href="https://docs.asp.net/en/latest/security/authentication/accconfirm.html" target="_blank" rel="noopener">https://docs.asp.net/en/latest/security/authentication/accconfirm.html</a>。</p>
+        <p><img src="http://durow.gitee.io/source/images/2016/0818/201608180000.jpg" alt="Auth"></p>
+<a id="more"></a>
+<h2 id="0x00-问题来源"><a href="#0x00-问题来源" class="headerlink" title="0x00 问题来源"></a>0x00 问题来源</h2><p>在新建.NET Core的Web项目时选择“使用个人用户账户”就可以创建一个带有用户和权限管理的项目，已经准备好了用户注册、登录等很多页面，也可以使用AuthorizeAttribute进行各种权限管理，看起来似乎十分方便。不过生成的代码都替我干了些什么我一团雾水。看了下生成的数据表，功能也挺复杂的。实际上我需要的只是基于用户和角色的认证管理，而且用户资料是使用现有的库，但使用.NET Core自带的认证组件必须要依赖EF，表的结构也很多对不上，所以学习了下自带的认证组件的实现，然后自己写了个认证服务替换了Identity组件，同时Cookie管理使用自带的Cookie中间件、可以使用AuthorizeAttribute进行认证。复杂的需求还没遇到，所以就学习到了这里。这篇博客主要讨论最简单情况下的的基于用户和角色的认证。关于.NET Core自带认证组件的一些基本用法，可以参考<a href="https://docs.asp.net/en/latest/security/authentication/accconfirm.html" target="_blank" rel="noopener">https://docs.asp.net/en/latest/security/authentication/accconfirm.html</a>。</p>
 <h2 id="0x01-NET-Core中的认证管理"><a href="#0x01-NET-Core中的认证管理" class="headerlink" title="0x01 .NET Core中的认证管理"></a>0x01 .NET Core中的认证管理</h2><p>提到认证管理，首相想到的就是用户的注册、登录、注销以及给用户添加/删除角色等功能。其中用户信息，角色信息等都是保存在数据库中的。所以主要包含数据库操作和登录业务逻辑两部分。在登录业务逻辑层面，.NET Core主要通过三个比较核心的类UserManager、RoleManager、SigninManager进行管理（在Microsoft.AspNetCore.Identity程序集）。其中：</p>
 <ul>
 <li>UserManager主要负责用户的认证、注册、修改、删除以及与用户相关的角色、令牌、声明等的管理。</li>
@@ -441,33 +440,33 @@
 <li>SigninManager负责登录、注销等相关操作。在涉及到用户操作（如登陆时用户验证）会调用UserManager进行操作。</li>
 </ul>
 <p>这三个核心类在操作数据库时，使用数据库层面的UserStore、RoleStore进行操作（在Microsoft.AspNetCore.Identity.EntityFrameworkCore程序集）。业务关系如下图所示：</p>
-<p><img src="/images/2016/0818/201608180101.png" alt="Auth"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/0818/201608180101.png" alt="Auth"></p>
 <p>我们在开发认证相关功能时使用这三个核心类即可满足大多数需求。我们在使用这几个核心类的对象时都是通过依赖注入获取的，那么这些相关的依赖是什么时候注入的呢？在Startup的ConfigureServices方法中有AddIdentity扩展方法，就是在这个方法中添加了需要的所有依赖。</p>
-<p><img src="/images/2016/0818/201608180102.png" alt="Auth"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/0818/201608180102.png" alt="Auth"></p>
 <h2 id="0x02-登录和注销"><a href="#0x02-登录和注销" class="headerlink" title="0x02 登录和注销"></a>0x02 登录和注销</h2><p>了解了Identity组件的整体分工后，再来看一下登录和注销的操作的部分细节。登录和注销过程主要由SigninManager负责，的先来看一下登录的过程：</p>
-<p><img src="/images/2016/0818/201608180201.png" alt="Auth"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/0818/201608180201.png" alt="Auth"></p>
 <p>登录成功后Response的Header中包含了Set-Cookie，Cookie的Key需要和Cookie中间件中设置的要解密的Cookie的Key一致，在截图中这个Cookie的Key是IdentityCookie。设置Cookie的同时返回302重定向到登录页面。</p>
-<p><img src="/images/2016/0818/201608180202.png" alt="Auth"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/0818/201608180202.png" alt="Auth"></p>
 <p>重定向到登陆页面时，请求中已经带有设置的Key为IdentityCookie的Cookie了。</p>
-<p><img src="/images/2016/0818/201608180203.png" alt="Auth"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/0818/201608180203.png" alt="Auth"></p>
 <p>注销过程比较简单，调用HttpContext.Authentication.SignOutAsync方法即可注销，此时会给HttpContext.Response添加Set-Cookie，但内容为空。</p>
-<p><img src="/images/2016/0818/201608180204.png" alt="Auth"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/0818/201608180204.png" alt="Auth"></p>
 <h2 id="0x03-通过Cookie识别用户"><a href="#0x03-通过Cookie识别用户" class="headerlink" title="0x03 通过Cookie识别用户"></a>0x03 通过Cookie识别用户</h2><p>.NET Core中通过CookieAuthenticationMiddleware这个中间件识别HttpContext中认证相关的Cookie，从而添加用户的验证和授权信息。最关键的是ClaimsPrincipal对象，它记录用户的认证和授权信息（除此之外当然也可以包含其它你需求的任意信息），从上面登录过程可以看到，登录成功后用户认证和授权信息保存至ClaimsPrincipal对象（实际上对于这条Cookie键值对中的认证信息保存为ClaimsIdentity，一个ClaimsPrincipal可以包含多个ClaimsIdentity），然后在HttpContext.Response的Headers中添加Set-Cookie，Key为Cookie中间件中指定的CookieName，Value就是这个对象加密后的字符串。以后的HttpContext都会带有这个Cookie，Cookie中间件会把符合这个CookieName的Cookie取出来，解密并还原为ClaimsPrincipal对象，并把HttpContext.User设置为这个对象。后面MVC中间件在路由到相应Controller和Action的时候就可以根据Authorize特性中指定的认证和角色在HttpContext.User中进行检查，不满足检查则跳转至相应页面。因此需要注意的就是一定要把Cookie中间件放在MVC中间件之前。</p>
-<p><img src="/images/2016/0818/201608180301.png" alt="Auth"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/0818/201608180301.png" alt="Auth"></p>
 <p>这里需要特别说一下ClaimsPrincipal。一个ClaimsPrincipal对象中包含了一个或多个ClaimsIdentity对象，一个ClaimsIdentity对象一般来说对应着一个Cookie中某条键值对（个人理解）。Cookie中间件和ClaimsIdentity是通过AuthenticationScheme联系起来的。后面我们在写自己的认证服务时，也是把Cookie中间件的AuthenticationScheme和创建的ClaimsIdentity一致。所以更准确地说是ClaimsIdentity包含了用户认证和权限的声明，而ClaimsPrincipal可以包含多个ClaimsIdentity。当管道中存在多个Cookie中间件时，通过AuthenticationScheme进行区分。</p>
 <p>在ClaimsIdentity中除了AuthenticationScheme外还有两个比较重要的属性，UserType和RoleType，其中UserType指定了用户验证类型，RoleType指定可角色验证类型。意思就是如果我指定了RoleType为”RoleName”，那么在进行角色认证时就会寻找Claims中所有的Type为”RoleName”的值，并检查其中是否包含了Authorize中指定的RoleName。不过.NET Core中自带了ClaimTypes，可以直接使用。例如角色类型就是ClaimTypes.Role。如果添加角色时用的自带的ClaimTypes.Role，那么在创建ClaimsIdentity时就不需要显示指定RoleType了，默认角色认证就是使用ClaimTypes.Role。</p>
 <p>关于Cookie中间件的添加，是通过Startup中Configure方法中的app.UseIdentity扩展方法实现的。这个扩展方法实际上添加了多种Cookie识别方式。在后面我在写自己的用户认证管理时只用一种。</p>
-<p><img src="/images/2016/0818/201608180302.png" alt="Auth"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/0818/201608180302.png" alt="Auth"></p>
 <h2 id="0x04-自己写用户认证管理"><a href="#0x04-自己写用户认证管理" class="headerlink" title="0x04 自己写用户认证管理"></a>0x04 自己写用户认证管理</h2><p>了解了用户认证的过程，我们可以自己写认证管理来代替Identity组件了，同样分为数据库操作和认证业务逻辑。数据库相关就不多说了，都写到了IdentityRepository类，只有很简单的数据操作。为了方便使用了Dapper，数据库用的Sqlite。程序在启动时会检查数据库表，没有会自动创建空表。</p>
-<p><img src="/images/2016/0818/201608180401.png" alt="Auth"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/0818/201608180401.png" alt="Auth"></p>
 <p>认证服务也比较简单就都写到了IdentityService类，提供了注册和登录操作，注销太简了直接写在了Action里。为了方便没有提供角色管理页面，如果要测试角色认证功能，需要手动去数据库添加Role，然后在UserRoles中给用户添加Role。</p>
-<p><img src="/images/2016/0818/201608180402.png" alt="Auth"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/0818/201608180402.png" alt="Auth"></p>
 <p>登录：</p>
-<p><img src="/images/2016/0818/201608180403.png" alt="Auth"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/0818/201608180403.png" alt="Auth"></p>
 <p>注册：</p>
-<p><img src="/images/2016/0818/201608180404.png" alt="Auth"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/0818/201608180404.png" alt="Auth"></p>
 <p>注销：</p>
-<p><img src="/images/2016/0818/201608180405.png" alt="Auth"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/0818/201608180405.png" alt="Auth"></p>
 <p>具体示例可以到：</p>
 <p><a href="https://github.com/durow/NetCoreStudy" target="_blank" rel="noopener">https://github.com/durow/NetCoreStudy</a></p>
 <p>只是为了测试，逻辑上很多问题，比如用户密码明文存储。重点看过程:)</p>
@@ -663,7 +662,7 @@ var jiathis_config={
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">27</span>
+                  <span class="site-state-item-count">28</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -674,7 +673,7 @@ var jiathis_config={
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -685,7 +684,7 @@ var jiathis_config={
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-count">30</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>

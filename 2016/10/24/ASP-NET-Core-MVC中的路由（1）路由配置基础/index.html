@@ -89,13 +89,13 @@
 <meta property="og:url" content="http://durow.vip/2016/10/24/ASP-NET-Core-MVC中的路由（1）路由配置基础/index.html">
 <meta property="og:site_name" content="Durow&#39;s corner">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://durow.vip/images/2016/1030/201610300000.png">
-<meta property="og:image" content="http://durow.vip/images/2016/1024/201610240001.png">
-<meta property="og:image" content="http://durow.vip/images/2016/1024/201610240201.png">
-<meta property="og:updated_time" content="2018-03-21T00:55:52.749Z">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/1030/201610300000.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/1024/201610240001.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/1024/201610240201.png">
+<meta property="og:updated_time" content="2018-03-22T06:38:50.730Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ASP.NET Core MVC中的路由（1）路由配置基础">
-<meta name="twitter:image" content="http://durow.vip/images/2016/1030/201610300000.png">
+<meta name="twitter:image" content="http://durow.gitee.io/source/images/2016/1030/201610300000.png">
 
 
 
@@ -419,10 +419,10 @@
       
 
       
-        <p><img src="/images/2016/1030/201610300000.png" alt="ASP.NET"></p>
+        <p><img src="http://durow.gitee.io/source/images/2016/1030/201610300000.png" alt="ASP.NET"></p>
 <a id="more"></a>
 <h2 id="0x00-路由在MVC中起到的作用"><a href="#0x00-路由在MVC中起到的作用" class="headerlink" title="0x00 路由在MVC中起到的作用"></a>0x00 路由在MVC中起到的作用</h2><p>前段时间一直忙于别的事情，终于搞定了继续学习.NetCore。这次学习的主题是MVC中的路由。路由是所有MVC框架都会实现的一个组件，核心功能就是根据接收到的Http请求中的Path（对于<a href="http://localhost/Home/Index/12?test=555" target="_blank" rel="noopener">http://localhost/Home/Index/12?test=555</a> 来说，http是协议，localhost是域，Home/Index/12是Path，test=555是参数）部分，依次和路由规则集合中的规则进行匹配，匹配成功后由对应的Controller中的对应Action进行Http请求的处理。匹配不到则返回404错误。</p>
-<p><img src="/images/2016/1024/201610240001.png" alt="路由"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/1024/201610240001.png" alt="路由"></p>
 <p>大多数MVC框架路由规则的配置都大同小异，一般都是通过模板的方式来配置路由规则。有的还支持在Controller和Action上通过Attribute（Java中叫注解）进行更细粒度的配置。</p>
 <p>ASP.NET Core MVC支持通过全局的路由模板配置路由规则，也支持在Controller和Action上通过Attribute进行细粒度的路由配置。下面先说一下在Startup.cs中配置全局路由规则。</p>
 <h2 id="0x01-在Startup-cs中配置路由"><a href="#0x01-在Startup-cs中配置路由" class="headerlink" title="0x01 在Startup.cs中配置路由"></a>0x01 在Startup.cs中配置路由</h2><p>所谓的路由的模板就是一串字符串，当接收到Http请求后取出其中的Path部分，和模板进行对照，如果匹配模板则路由到对应的Controller和Action进行处理。我们可以在Startup.cs文件中的Configure方法中，添加MVC功能时进行路由配置，例如：</p>
@@ -493,7 +493,7 @@
 <p>第一次接触用Route特性配置路由时，我很疑惑路由组件是如何把Path路由到对应的Controller和Action的，后来下了个断点看了下RouteData对象，发现对于配置了路由的Action方法，其controller为方法所在的Controller的名称，action为方法的名称，而且在Route特性配置的路由模板中不能够使用{controller}变量和{action}变量。这样就保证了匹配模板的Path总能路由到这个Action。</p>
 <p>对于在Controller类上配置的Route特性最终会分别配置到Controller中的每个Action上。例如我们在TestController上配置Route(“TestShow”)，实际上就是给每个方法配置了Route(“TestShow”)，所以当Path为TestShow时会报错，提示有两个action满足匹配。那么应当如何给Controller通过Route配置路由呢，可以使用[controller]和[action]。</p>
 <h3 id="Route特性中的-controller-和-action"><a href="#Route特性中的-controller-和-action" class="headerlink" title="Route特性中的[controller]和[action]"></a>Route特性中的[controller]和[action]</h3><p>对于[controller]和[action]我也不知道该怎么叫，不能叫变量，功能上类似占位符。当我们在Controller类用Route特性配置路由时，如果使用了[controller]和[action]，这样当Route特性给Controller中每个Action配置路由时，[controller]会被替换为Controller名称，[action]会被替换为Action名称。举个例子还是给TestController配置Route特性，配置为Route(“durow/[controller]/[action]”)，这样对于其中的Index方法来说，其路由模板为”durow/Test/Index”，controller为Test，action为Index。而对于Show方法来说路由模板为”durow/Test/Show”，controller为Test，action为Show。前面说过MVC会为每个Action创建一个ActionDescriptor对象存储这个Action的路由信息。对于配置了Route特性的Action（再重复一下，给Controller类配置Route特性相当于给Controller中的每个Action配置Route特性），其ActionDescriptor中会有一个AttributeRouteInfo对象，对于未配置Route特性的Action，该对象为空。AttributeRouteInfo中包含了路由模板信息。</p>
-<p><img src="/images/2016/1024/201610240201.png" alt="路由"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/1024/201610240201.png" alt="路由"></p>
 <p>所以对于上面TestController的Route特性的配置，配置为Route(“durow/Test/[action]”)也能达到同样的效果。不过使用Route(“durow/[controller]/[action]”)语义更强更通用。</p>
 <h3 id="在Route特性中使用变量"><a href="#在Route特性中使用变量" class="headerlink" title="在Route特性中使用变量"></a>在Route特性中使用变量</h3><p>在Route特性中配置模板也是可以使用变量的，同样可以使用?标记变量可选。例如可以给TestController配置<code>Route(&quot;durow/[controller]/[action]/{id?}&quot;)</code>。但需要注意的是Route特性的模板中变量不能使用默认值（包括[controller]和[action]），也不能使用*提取Path所有剩余部分。</p>
 <h2 id="0x03-写在最后"><a href="#0x03-写在最后" class="headerlink" title="0x03 写在最后"></a>0x03 写在最后</h2><p>啰啰嗦嗦居然写了这么多，其实实际使用中很可能用不到多么复杂的路由，一般一条通用规则，一条Area相关的规则就可以了。不过详细了解了路由规则，当以后遇到有些奇葩的特殊需求时能够有更加开阔的思路。后面讲讨论一下路由模板中的约束和自定义约束。再后面讨论一下使用Areas。</p>
@@ -688,7 +688,7 @@ var jiathis_config={
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">27</span>
+                  <span class="site-state-item-count">28</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -699,7 +699,7 @@ var jiathis_config={
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -710,7 +710,7 @@ var jiathis_config={
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-count">30</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>

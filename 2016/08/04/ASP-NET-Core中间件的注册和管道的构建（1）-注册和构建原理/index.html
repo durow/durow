@@ -83,30 +83,28 @@
 
 
 
-<meta name="description" content="0x00 问题的产生">
 <meta name="keywords" content="ASP.NET Core,MVC,中间件,管道">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ASP.NET Core中间件的注册和管道的构建（1）---- 注册和构建原理">
 <meta property="og:url" content="http://durow.vip/2016/08/04/ASP-NET-Core中间件的注册和管道的构建（1）-注册和构建原理/index.html">
 <meta property="og:site_name" content="Durow&#39;s corner">
-<meta property="og:description" content="0x00 问题的产生">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://durow.vip/images/2016/0804/201608040101.png">
-<meta property="og:image" content="http://durow.vip/images/2016/0804/201608040102.png">
-<meta property="og:image" content="http://durow.vip/images/2016/0804/201608040103.png">
-<meta property="og:image" content="http://durow.vip/images/2016/0804/201608040201.png">
-<meta property="og:image" content="http://durow.vip/images/2016/0804/201608040301.png">
-<meta property="og:image" content="http://durow.vip/images/2016/0804/201608040302.png">
-<meta property="og:image" content="http://durow.vip/images/2016/0804/201608040303.png">
-<meta property="og:image" content="http://durow.vip/images/2016/0804/201608040304.png">
-<meta property="og:image" content="http://durow.vip/images/2016/0804/201608040305.png">
-<meta property="og:image" content="http://durow.vip/images/2016/0804/201608040306.png">
-<meta property="og:image" content="http://durow.vip/images/2016/0804/201608040307.png">
-<meta property="og:updated_time" content="2018-03-21T08:10:57.357Z">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0804/201608040000.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0804/201608040101.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0804/201608040102.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0804/201608040103.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0804/201608040201.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0804/201608040301.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0804/201608040302.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0804/201608040303.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0804/201608040304.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0804/201608040305.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0804/201608040306.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/0804/201608040307.png">
+<meta property="og:updated_time" content="2018-03-22T06:38:50.739Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ASP.NET Core中间件的注册和管道的构建（1）---- 注册和构建原理">
-<meta name="twitter:description" content="0x00 问题的产生">
-<meta name="twitter:image" content="http://durow.vip/images/2016/0804/201608040101.png">
+<meta name="twitter:image" content="http://durow.gitee.io/source/images/2016/0804/201608040000.jpg">
 
 
 
@@ -430,38 +428,39 @@
       
 
       
-        <h2 id="0x00-问题的产生"><a href="#0x00-问题的产生" class="headerlink" title="0x00 问题的产生"></a>0x00 问题的产生</h2><a id="more"></a>
-<p>管道是.NET Core中非常关键的一个概念，很多重要的组件都以中间件的形式存在，包括权限管理、会话管理、路由等。所以搞明白中间件是如何注册并最终构建成管道的很重要。园子里很多先驱早已经开始了这方面的研究学习，也写了很多文章，不过我看了后有些地方还不是特别明白。毕竟每个人都是不同的，有些内容作者觉得是常识不需要多写的地方对我来说可能就是个盲区。幸好.NET Core整个项目都是开源的，找到源码看了下解决了我心中的困惑。同时写篇博客记录一下，也算一个补充，如果大家看了能有所收获那就更好了。本来是想一片文章写完的，后来发现太长了，所以分了两篇。这是第一篇，主要说一下中间件的注册和管道的构建原理，后面一篇写一下注册中间件类的原理和写中间件类需要注意的约定和特性。</p>
+        <p><img src="http://durow.gitee.io/source/images/2016/0804/201608040000.jpg" alt="Pipline"></p>
+<a id="more"></a>
+<h2 id="0x00-问题的产生"><a href="#0x00-问题的产生" class="headerlink" title="0x00 问题的产生"></a>0x00 问题的产生</h2><p>管道是.NET Core中非常关键的一个概念，很多重要的组件都以中间件的形式存在，包括权限管理、会话管理、路由等。所以搞明白中间件是如何注册并最终构建成管道的很重要。园子里很多先驱早已经开始了这方面的研究学习，也写了很多文章，不过我看了后有些地方还不是特别明白。毕竟每个人都是不同的，有些内容作者觉得是常识不需要多写的地方对我来说可能就是个盲区。幸好.NET Core整个项目都是开源的，找到源码看了下解决了我心中的困惑。同时写篇博客记录一下，也算一个补充，如果大家看了能有所收获那就更好了。本来是想一片文章写完的，后来发现太长了，所以分了两篇。这是第一篇，主要说一下中间件的注册和管道的构建原理，后面一篇写一下注册中间件类的原理和写中间件类需要注意的约定和特性。</p>
 <h2 id="0x01-中间件的注册"><a href="#0x01-中间件的注册" class="headerlink" title="0x01 中间件的注册"></a>0x01 中间件的注册</h2><p>管道的构建主要包含中间件注册和把注册的中间件构建成管道。先来说中间件的注册。</p>
 <p>什么是中间件。说简单一点中间件就是一个方法，传入一个HttpContext类型参数，返回Task。参数HttpContext中包含了HTTP请求和响应等相关信息，中间件可以读取/修改其中的部分内容，并决定是否让下一个中间件继续处理这个HttpContext。这个方法包装为一个委托RequestDelegate。</p>
-<p><img src="/images/2016/0804/201608040101.png" alt="Pipline"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/0804/201608040101.png" alt="Pipline"></p>
 <p>为了让中间件有权决定是否让下一个中间件继续处理HttpContext，当前中间件需要下一个中间件的引用。所以在注册中间件的时候需要注册为Func&lt;RequestDelegate,RequestDelegate&gt;的形式，其中传入的参数指的是下一个中间件，返回的是我们注册的中间件，传入的参数在ApplicationBuilder在执行Build()方法构建管道时传入(后面会看到)。所以为了方便理解，不那么严谨的来看，中间件以Func&lt;NextMiddleware,ThisMiddleware&gt;的形式注册并存储在一个列表中。</p>
-<p><img src="/images/2016/0804/201608040102.png" alt="Pipline"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/0804/201608040102.png" alt="Pipline"></p>
 <p>可以通过ApplicationBuilder的Use方法注册中间件</p>
-<p><img src="/images/2016/0804/201608040103.png" alt="Pipline"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/0804/201608040103.png" alt="Pipline"></p>
 <h2 id="0x02-管道的构建"><a href="#0x02-管道的构建" class="headerlink" title="0x02 管道的构建"></a>0x02 管道的构建</h2><p>管道的构建就是把Func&lt;RequestDelegate,RequestDelegate&gt;列表串在一起。用第一个Func的返回值作为第二个Func的参数，第二个Func的返回值作为第三个Func的参数，依次类推。最终返回最后一个Func返回的RequestDelegate（中间件）。管道工作时最后一个RequestDelegate可以决定是否调用倒数第二个RequestDelegate，倒数第二个RequestDelegate可以决定是否调用倒数第三个RequestDelegate，依次类推直到调用第一个RequestDelegate。这中间有两个问题：</p>
 <p>第一个是这样构建管道，中间件的顺序和注册的时候是相反的，所以在构件时首先把列表_components.Reverse()以保证正确的中间件顺序。</p>
 <p>第二个问题是构建第一个中间件时没有RequestDelegate可以传入，所以需要构建一个把状态码设置为404的中间件作为最开始的RequestDelegate传入。当然在构建完成后这个中间件是存在于管道最末端的。这样管道构建就算完成了。Build()代码如下：</p>
-<p><img src="/images/2016/0804/201608040201.png" alt="Pipline"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/0804/201608040201.png" alt="Pipline"></p>
 <h2 id="0x03-测试"><a href="#0x03-测试" class="headerlink" title="0x03 测试"></a>0x03 测试</h2><p>构建完成后的管道和中间件如下图：</p>
-<p><img src="/images/2016/0804/201608040301.png" alt="Pipline"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/0804/201608040301.png" alt="Pipline"></p>
 <p>这是微软官方的图，很多文章中也引用过。从这张图中可以看出来中间件通过调用next()启动下一个中间件。如果中间件不调用next()那么它之后的所有中间件就都不会调用了。除此之外还有一个细节需要注意，就是next()的调用并不是必须要放到最后的。也就是说可以先调用后面的中间件，等后面的中间件调用完成后在执行一些操作（图中的more logic）。</p>
 <p>下面来分别进行测试，正常建立一个.NET Core MVC Web项目。</p>
 <h3 id="测试1"><a href="#测试1" class="headerlink" title="测试1"></a>测试1</h3><p>注释掉Configure()中的所有内容，然后依次注册中间件：</p>
-<p><img src="/images/2016/0804/201608040302.png" alt="Pipline"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/0804/201608040302.png" alt="Pipline"></p>
 <p>运行后结果为：</p>
-<p><img src="/images/2016/0804/201608040303.png" alt="Pipline"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/0804/201608040303.png" alt="Pipline"></p>
 <p>这个测试印证了之前代码中看到的中间件的注册顺序就是调用顺序。</p>
 <h3 id="测试2"><a href="#测试2" class="headerlink" title="测试2"></a>测试2</h3><p>注释掉Middleware1的next调用，其它保持不变。这样Middleware1就不会调用Middleware2，Middleware2以及之后的所有中间件都无法调用。</p>
-<p><img src="/images/2016/0804/201608040304.png" alt="Pipline"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/0804/201608040304.png" alt="Pipline"></p>
 <p>运行结果变为：</p>
-<p><img src="/images/2016/0804/201608040305.png" alt="Pipline"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/0804/201608040305.png" alt="Pipline"></p>
 <p>这个测试说明Middleware1不调用next()的话后面的Middleware2和Middleware3都没有被调用。</p>
 <h3 id="测试3"><a href="#测试3" class="headerlink" title="测试3"></a>测试3</h3><p>把Configure()方法修改如下：</p>
-<p><img src="/images/2016/0804/201608040306.png" alt="Pipline"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/0804/201608040306.png" alt="Pipline"></p>
 <p>我们在最开始注册一个中间件记录当前时间，然后调用后面所有中间件，最后返回时计算后面所有中间件执行所消耗的时间。为了看上去更明显后面又注册了一个中间件强制睡眠100毫秒。需要注意的是强制睡眠的中间件要注册在MVC之前，因为MVC结束后就直接返回了，不会调用后面的中间件了。</p>
 <p>运行结果为：</p>
-<p><img src="/images/2016/0804/201608040307.png" alt="Pipline"></p>
+<p><img src="http://durow.gitee.io/source/images/2016/0804/201608040307.png" alt="Pipline"></p>
 <p>这个测试说明对下一个中间件的调用不一定非要放到最后，可以先调用后面中间件，等后面所有中间件调用完成后再继续处理。</p>
 <h2 id="0x04-写在最后"><a href="#0x04-写在最后" class="headerlink" title="0x04 写在最后"></a>0x04 写在最后</h2><p>这篇文章主要讨论了中间件的注册和管道构建的一些原理，实际上对于复杂一点的中间件来说，一般都有更复杂的逻辑并对其它组件依赖。下一篇将讨论把中间件写成一个类并注入依赖的方法和原理。</p>
 <p>此外这篇文章主要是我个人的一些理解和直觉。。。好吧真的有些是直觉，能力有限，博客园大牛众多，有错误的地方大家嘴下留情啊。</p>
@@ -658,7 +657,7 @@ var jiathis_config={
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">27</span>
+                  <span class="site-state-item-count">28</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -669,7 +668,7 @@ var jiathis_config={
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -680,7 +679,7 @@ var jiathis_config={
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-count">30</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
