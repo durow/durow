@@ -83,18 +83,28 @@
 
 
 
-<meta name="description" content="热爱生活 热爱学习">
 <meta name="keywords" content="C#,异步">
 <meta property="og:type" content="article">
 <meta property="og:title" content="C#执行异步操作的几种方式比较和总结">
 <meta property="og:url" content="http://durow.vip/2015/09/21/C-执行异步操作的几种方式比较和总结/index.html">
-<meta property="og:site_name" content="Durow&#39;s corner">
-<meta property="og:description" content="热爱生活 热爱学习">
+<meta property="og:site_name" content="Durowの隅">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-03-21T05:09:11.183Z">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0921/201509210000.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0921/201509210101.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0921/201509210102.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0921/201509210201.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0921/201509210301.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0921/201509210401.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0921/201509210501.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0921/201509210502.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0921/201509210601.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0921/201509210602.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0921/201509210603.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0921/201509210604.png">
+<meta property="og:updated_time" content="2018-03-23T02:46:24.522Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="C#执行异步操作的几种方式比较和总结">
-<meta name="twitter:description" content="热爱生活 热爱学习">
+<meta name="twitter:image" content="http://durow.gitee.io/source/images/2015/0921/201509210000.jpg">
 
 
 
@@ -130,7 +140,7 @@
 
 
 
-  <title>C#执行异步操作的几种方式比较和总结 | Durow's corner</title>
+  <title>C#执行异步操作的几种方式比较和总结 | Durowの隅</title>
   
 
 
@@ -170,7 +180,7 @@
     <div class="custom-logo-site-title">
       <a href="/"  class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Durow's corner</span>
+        <span class="site-title">Durowの隅</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
@@ -316,7 +326,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Durow's corner">
+      <meta itemprop="name" content="Durowの隅">
     </span>
 
     
@@ -407,7 +417,41 @@
       
 
       
-        
+        <p><img src="http://durow.gitee.io/source/images/2015/0921/201509210000.jpg" alt="Async"></p>
+<a id="more"></a>
+<h2 id="0x00-引言"><a href="#0x00-引言" class="headerlink" title="0x00 引言"></a>0x00 引言</h2><p>之前写程序的时候在遇到一些比较花时间的操作例如HTTP请求时，总是会new一个Thread处理。对XxxxxAsync()之类的方法也没去了解过，倒也没遇到什么大问题。最近因为需求要求用DevExpress写界面，跑起来后发现比Native控件效率差好多。这才想到之前看到的“金科玉律”:不要在UI线程上执行界面无关的操作，因此集中看了下C#的异步操作，分享一下自己的比较和总结。</p>
+<h2 id="0x01-测试方法"><a href="#0x01-测试方法" class="headerlink" title="0x01 测试方法"></a>0x01 测试方法</h2><p>IDE：VS2015 Community</p>
+<p>.NET版本：4.5</p>
+<p>使用函数随机休眠100到500毫秒来模拟耗时任务，并返回任务花费的时间，在UI线程上调用这个方法会造成阻塞，导致UI假死，因此需要通过异步方式执行这个任务，并在信息输出区域显示花费的时间。</p>
+<p><img src="http://durow.gitee.io/source/images/2015/0921/201509210101.png" alt="Async"></p>
+<p>主界面中通过各种不同按钮测试不同类型的异步操作</p>
+<p><img src="http://durow.gitee.io/source/images/2015/0921/201509210102.png" alt="Async"></p>
+<h2 id="0x02-使用Thread进行异步操作"><a href="#0x02-使用Thread进行异步操作" class="headerlink" title="0x02 使用Thread进行异步操作"></a>0x02 使用Thread进行异步操作</h2><p>使用ThreadPool进行异步操作的方法如下所示，需要注意的就是IsBackground默认为false，也就是该线程对调用它的线程不产生依赖，当调用线程退出时该线程也不会结束。因此需要将IsBackground设置为true以指明该线程是后台线程，这样当主线程退出时该线程也会结束。另外跨线程操作UI还是要借助Dispatcher.BeginInvoke()，如果需要阻塞UI线程可以使用Dispatcher.Invoke()。</p>
+<p><img src="http://durow.gitee.io/source/images/2015/0921/201509210201.png" alt="Async"></p>
+<h2 id="0x03-使用ThreadPool进行异步操作"><a href="#0x03-使用ThreadPool进行异步操作" class="headerlink" title="0x03 使用ThreadPool进行异步操作"></a>0x03 使用ThreadPool进行异步操作</h2><p>ThreadPool（线程池）的出现主要就是为了提高线程的复用（类似的还有访问数据库的连接池）。线程的创建是开销比较大的行为，为了达到较好的交互体验，开发中可能会大量使用异步操作，特别是需要频繁进行大量的短时间的异步操作时，频繁创建和销毁线程会在造成很多资源的浪费。而通过在线程池中存放一些线程，当需要新建线程执行操作时就从线程池中取出一个已经存在的空闲线程使用，如果此时没有空闲线程，且线程池中的线程数未达到线程池上限，则新建一个线程，使用完成后再放回到线程池中。这样可以极大程度上省去线程创建的开销。线程池中线程的最小和最大数都可以指定，不过多数情况下无需指定，CLR有一套管理线程池的策略。ThreadPool的使用非常简单，代码如下所示。跨线程操作UI仍需借助Dispatcher。</p>
+<p><img src="http://durow.gitee.io/source/images/2015/0921/201509210301.png" alt="Async"></p>
+<h2 id="0x04-使用Task进行异步操作"><a href="#0x04-使用Task进行异步操作" class="headerlink" title="0x04 使用Task进行异步操作"></a>0x04 使用Task进行异步操作</h2><p>Task进行异步操作时也是从线程池中获取线程进行操作，不过支持的操作更加丰富一些。而且Task<t>可以支持返回值，通过Task的ContinueWith()可以在Task执行结束后将返回值传入以进行操作，但在ContinueWith中跨线程操作UI仍需借助Dispatcher。另外Task也可以直接使用静态方法Task.Run<t>()执行异步操作。</t></t></p>
+<p><img src="http://durow.gitee.io/source/images/2015/0921/201509210401.png" alt="Async"></p>
+<h2 id="0x05-使用async-await进行异步操作"><a href="#0x05-使用async-await进行异步操作" class="headerlink" title="0x05 使用async/await进行异步操作"></a>0x05 使用async/await进行异步操作</h2><p>这个是C#5中的新特性，当遇到await时，会从线程池中取出一个线程异步执行await等待的操作，然后方法立即返回。等异步操作结束后回到await所在的地方接着往后执行。await需要等待<code>async Task&lt;T&gt;</code>类型的函数。详细的使用方法可参考相关资料，测试代码如下所示。异步结束后的会返回到调用线程，所以修改UI不需要Dispatcher。</p>
+<p><img src="http://durow.gitee.io/source/images/2015/0921/201509210501.png" alt="Async"></p>
+<p>也可以把TestTask包装成async方法，这样就可以使用上图中注释掉的两行代码进行处理。包装后的异步方法如下所示：</p>
+<p><img src="http://durow.gitee.io/source/images/2015/0921/201509210502.png" alt="Async"></p>
+<p>async/await也是从线程池中取线程，可实现线程复用，而且代码简洁容易阅读，异步操作返回后会自动返回调用线程，是执行异步操作的首选方式。而且虽然是C#5的新特性，但C#4可以通过下载升级包来支持async/await。</p>
+<h2 id="0x06-关于效率"><a href="#0x06-关于效率" class="headerlink" title="0x06 关于效率"></a>0x06 关于效率</h2><p>以上尝试的方法除了直接使用Thread之外，其他几种都是直接或间接使用线程池来获取线程的。从理论上来分析，创建线程时要给线程分配栈空间，线程销毁时需要回收内存，创建线程也会增加CPU的工作。因此可以连续创建线程并记录消耗的时间来测试性能。测试代码如下所示：</p>
+<p><img src="http://durow.gitee.io/source/images/2015/0921/201509210601.png" alt="Async"></p>
+<p>当测试Thread时每次测试在连续创建线程时内存和CPU都会有个小突起，不过在线程结束后很快就会降下去，在我的电脑上连续创建100个线程大概花费120-130毫秒。如图所示：</p>
+<p><img src="http://durow.gitee.io/source/images/2015/0921/201509210602.png" alt="Async"></p>
+<p>测试结果：</p>
+<p><img src="http://durow.gitee.io/source/images/2015/0921/201509210603.png" alt="Async"></p>
+<p>使用基于线程池的方法创建线程时，有时第一次会稍慢一些，应该是线程池内线程不足，时间开销在0-15毫秒，第一次创建内存也会上升。后面再测试时时间开销为0毫秒，内存表现也很平稳，CPU开销分布比较平均。测试结果如图所示：</p>
+<p><img src="http://durow.gitee.io/source/images/2015/0921/201509210604.png" alt="Async"></p>
+<h2 id="0x07-结论"><a href="#0x07-结论" class="headerlink" title="0x07 结论"></a>0x07 结论</h2><p>在执行异步操作时应使用基于线程池的操作，从代码的简洁程度和可读性上优先使用async/await方式。对于较老的.NET版本可以使用Task或ThreadPool。符合以下情况的可以使用Thread：</p>
+<ul>
+<li>1、线程创建后需要持续工作到主线程退出的。这种情况下就算使用线程池线程也不会归还，实现不了复用，可以使用Thread。</li>
+<li>2、线程在主线程退出后仍需要执行的，这种情况使用线程池线程无法满足需求，需要使用Thread并制定IsBackground为false（默认）。</li>
+</ul>
+<h2 id="0x08-相关下载"><a href="#0x08-相关下载" class="headerlink" title="0x08 相关下载"></a>0x08 相关下载</h2><p>测试程序代码在：<a href="https://github.com/durow/TestArea/tree/master/AsyncTest/AsyncTest" target="_blank" rel="noopener">https://github.com/durow/TestArea/tree/master/AsyncTest/AsyncTest</a></p>
+
       
     </div>
     
@@ -471,6 +515,10 @@
       
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
+            
+              <a href="/2012/02/09/地狱训练第五章练习21要有爱不要自虐-上/" rel="next" title="地狱训练第五章练习21要有爱不要自虐">
+                <i class="fa fa-chevron-left"></i> 地狱训练第五章练习21要有爱不要自虐
+              </a>
             
           </div>
 
@@ -563,8 +611,17 @@ var jiathis_config={
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -683,6 +740,22 @@ var jiathis_config={
       </section>
 
       
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x00-引言"><span class="nav-number">1.</span> <span class="nav-text">0x00 引言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-测试方法"><span class="nav-number">2.</span> <span class="nav-text">0x01 测试方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-使用Thread进行异步操作"><span class="nav-number">3.</span> <span class="nav-text">0x02 使用Thread进行异步操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-使用ThreadPool进行异步操作"><span class="nav-number">4.</span> <span class="nav-text">0x03 使用ThreadPool进行异步操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x04-使用Task进行异步操作"><span class="nav-number">5.</span> <span class="nav-text">0x04 使用Task进行异步操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x05-使用async-await进行异步操作"><span class="nav-number">6.</span> <span class="nav-text">0x05 使用async/await进行异步操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x06-关于效率"><span class="nav-number">7.</span> <span class="nav-text">0x06 关于效率</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x07-结论"><span class="nav-number">8.</span> <span class="nav-text">0x07 结论</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x08-相关下载"><span class="nav-number">9.</span> <span class="nav-text">0x08 相关下载</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
 
       
         <div class="back-to-top">
@@ -717,7 +790,7 @@ var jiathis_config={
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">29.4k</span>
+    <span title="Site words total count">40.3k</span>
   
 </div>
 

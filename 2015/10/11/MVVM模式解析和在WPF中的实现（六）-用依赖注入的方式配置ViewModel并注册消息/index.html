@@ -83,18 +83,18 @@
 
 
 
-<meta name="description" content="热爱生活 热爱学习">
 <meta name="keywords" content="WPF,MVVM">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MVVM模式解析和在WPF中的实现（六） 用依赖注入的方式配置ViewModel并注册消息">
 <meta property="og:url" content="http://durow.vip/2015/10/11/MVVM模式解析和在WPF中的实现（六）-用依赖注入的方式配置ViewModel并注册消息/index.html">
-<meta property="og:site_name" content="Durow&#39;s corner">
-<meta property="og:description" content="热爱生活 热爱学习">
+<meta property="og:site_name" content="Durowの隅">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-03-21T04:12:04.172Z">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/1003/201510030000.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/1011/201510110101.png">
+<meta property="og:updated_time" content="2018-03-23T00:50:54.870Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="MVVM模式解析和在WPF中的实现（六） 用依赖注入的方式配置ViewModel并注册消息">
-<meta name="twitter:description" content="热爱生活 热爱学习">
+<meta name="twitter:image" content="http://durow.gitee.io/source/images/2015/1003/201510030000.jpg">
 
 
 
@@ -130,7 +130,7 @@
 
 
 
-  <title>MVVM模式解析和在WPF中的实现（六） 用依赖注入的方式配置ViewModel并注册消息 | Durow's corner</title>
+  <title>MVVM模式解析和在WPF中的实现（六） 用依赖注入的方式配置ViewModel并注册消息 | Durowの隅</title>
   
 
 
@@ -170,7 +170,7 @@
     <div class="custom-logo-site-title">
       <a href="/"  class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Durow's corner</span>
+        <span class="site-title">Durowの隅</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
@@ -316,7 +316,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Durow's corner">
+      <meta itemprop="name" content="Durowの隅">
     </span>
 
     
@@ -418,7 +418,20 @@
       
 
       
-        
+        <p><img src="http://durow.gitee.io/source/images/2015/1003/201510030000.jpg" alt="MVVM"></p>
+<a id="more"></a>
+<h2 id="0x00-最初的想法"><a href="#0x00-最初的想法" class="headerlink" title="0x00 最初的想法"></a>0x00 最初的想法</h2><p>这次主要讨论下给View指定ViewModel的事情。一般来说给View指定ViewModel常用的方式有两种，一种是在View的后台代码中写DataContext = new ViewModel()，还有一种是在XAML中指定View的DataContext。这两种方式都使得View对ViewModel产生了依赖，这种情况下可以考虑用依赖注入的方式使取消View对ViewModel的直接依赖。依赖注入一般来说可以通过构造函数注入、通过设置属性注入，这两种方法对于View来说都不合适。因此可以使用IoC Container，让View主动去获取对应的ViewModel。</p>
+<p>其实给View指定一个ViewModel并不属于频繁的操作，而且改起来也很容易，费半天劲搞个依赖注入确实不太至于。就像上篇文章中废了半天劲搞了个View和ViewModel的通信一样，用到的概率比较小，而且也有别的方式解决，虽然那种方式并不符合MVVM模式。不过View除了依赖ViewModel之外对消息注册器也是会产生依赖的，而且某种类型的View一般来说都依赖固定类型的ViewModel和消息注册器，因此可以一次注入两个依赖，这样貌似就值了，至少我认为是值了，所以有了ViewModelManager这个类。</p>
+<h2 id="0x01-ViewModel和MessageManager的依赖注入"><a href="#0x01-ViewModel和MessageManager的依赖注入" class="headerlink" title="0x01 ViewModel和MessageManager的依赖注入"></a>0x01 ViewModel和MessageManager的依赖注入</h2><p>使用静态类ViewModelManager来当作IoC Container。往IoC Container里注册依赖关系一般有两种方式，一种是将依赖关系以某种形式（例如xml）保存在外部，一种是在程序中注册到一个列表里。我采取第二种做法，因为比较容易:)</p>
+<p>程序在启动时使用ViewModelManager.Register将依赖关系注册到ViewModelManager中，View在构造函数中调用ViewModelManager.SetViewModel(this);来设置View的DataContext并通过依赖的消息注册器注册消息，消息注册器可以为空，代表View不接收消息。它们的关系如图所示：</p>
+<p><img src="http://durow.gitee.io/source/images/2015/1011/201510110101.png" alt="MVVM6"></p>
+<p>需要说明的有两个地方：</p>
+<p>一个是View和ViewModel的对应关系。一般来说一个View对应着一种ViewModel，这样注册起来是没问题的。但这个并不绝对，理论上来说一个View可以将DataContext设置为任意ViewModel，如果一个View可以设置多种ViewModel该如何处理呢，这时候可以在ViewModelManager注册时添加Token属性，然后用SetViewModel(this,token)的方式指定特定的ViewModel为DataContext。</p>
+<p>另一个是消息注册的范围。因为一般来说ViewModel都是和绑定的View通信。所以默认情况下，消息注册到单独一个MessageManager中，这个MessageManager保存ViewModel中，ViewModel使用这个MessageManager发送消息，发送的消息由View接收。但如果需要和其他View通信，需要把消息注册到MessageManager.Default中，这个对象是static的，要达到这个目的只要在View设置ViewMode时这样来SetViewModel(this,isGlobalMsg:true)即可。如果ViewModel又想和绑定的View单独通信，有时候还需要和别的View通信，可以在消息注册器中注册时将需要单独通信的消息设置一个Group，ViewModel在发送消息时加一个Group过滤一下即可。一个Group可以理解为消息的单独一个通道。</p>
+<p>顺带一提，好吧只是顺带一提的是，在给View注入ViewModel时，顺便把ViewModel的UIDispatcher属性设置为了View的Dispatcher，虽然我不知道这有什么用。但这样在ViewModel中使用UIDispatcher时即为相关的View的Dispatcher。如果要使用MainWindow的Dispatcher可以通过DispatcherHelper.Dispatcher或者App.Current.MainWindow.Dispatcher获得。</p>
+<h2 id="0x02-写在最后"><a href="#0x02-写在最后" class="headerlink" title="0x02 写在最后"></a>0x02 写在最后</h2><p>到此为止我能想到的MVVM框架的功能算是基本实现了，遇到的需求十分有限，才能也十分有限，能想到的就这几个了，欢迎回复讨论，也欢迎加我QQ16141860交流。之前一直是在TestArea这个仓库里进行测试，现在这个小框架整理了下，放到AyxMVVM仓库里了。现在有些想法还不太成熟，使用过程中遇到问题也会随时修正，以后就都修改到AyxMVVM中了，TestArea中的MyMVVM不再维护了。另外给仓库起名真是件麻烦事，干脆统一都用Ayx+XXX的方式，这样既容易重复的概率又十分小。Ayx是我名字拼音的首字母，想想看以拼音A开头的姓氏之少就能想到几乎不会出现重复了。最后，10月6日看了微软的秋季产品发布会后信仰充值成功。对UWP十分感兴趣，下一步打算学习一下。</p>
+<h2 id="0x03-关于AyxMVVM"><a href="#0x03-关于AyxMVVM" class="headerlink" title="0x03 关于AyxMVVM"></a>0x03 关于AyxMVVM</h2><p><a href="https://github.com/durow/AyxMVVM" target="_blank" rel="noopener">https://github.com/durow/AyxMVVM</a></p>
+
       
     </div>
     
@@ -578,8 +591,17 @@ var jiathis_config={
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -698,6 +720,22 @@ var jiathis_config={
       </section>
 
       
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x00-最初的想法"><span class="nav-number">1.</span> <span class="nav-text">0x00 最初的想法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-ViewModel和MessageManager的依赖注入"><span class="nav-number">2.</span> <span class="nav-text">0x01 ViewModel和MessageManager的依赖注入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-写在最后"><span class="nav-number">3.</span> <span class="nav-text">0x02 写在最后</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-关于AyxMVVM"><span class="nav-number">4.</span> <span class="nav-text">0x03 关于AyxMVVM</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
 
       
         <div class="back-to-top">
@@ -732,7 +770,7 @@ var jiathis_config={
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">29.4k</span>
+    <span title="Site words total count">40.3k</span>
   
 </div>
 

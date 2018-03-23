@@ -83,18 +83,19 @@
 
 
 
-<meta name="description" content="热爱生活 热爱学习">
 <meta name="keywords" content="WPF,MVVM">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MVVM模式解析和在WPF中的实现（五）View和ViewModel的通信">
 <meta property="og:url" content="http://durow.vip/2015/10/10/MVVM模式解析和在WPF中的实现（五）View和ViewModel的通信/index.html">
-<meta property="og:site_name" content="Durow&#39;s corner">
-<meta property="og:description" content="热爱生活 热爱学习">
+<meta property="og:site_name" content="Durowの隅">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-03-21T04:14:34.597Z">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/1003/201510030000.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/1010/201510100101.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/1010/201510100102.png">
+<meta property="og:updated_time" content="2018-03-23T00:51:17.954Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="MVVM模式解析和在WPF中的实现（五）View和ViewModel的通信">
-<meta name="twitter:description" content="热爱生活 热爱学习">
+<meta name="twitter:image" content="http://durow.gitee.io/source/images/2015/1003/201510030000.jpg">
 
 
 
@@ -130,7 +131,7 @@
 
 
 
-  <title>MVVM模式解析和在WPF中的实现（五）View和ViewModel的通信 | Durow's corner</title>
+  <title>MVVM模式解析和在WPF中的实现（五）View和ViewModel的通信 | Durowの隅</title>
   
 
 
@@ -170,7 +171,7 @@
     <div class="custom-logo-site-title">
       <a href="/"  class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Durow's corner</span>
+        <span class="site-title">Durowの隅</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
@@ -316,7 +317,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Durow's corner">
+      <meta itemprop="name" content="Durowの隅">
     </span>
 
     
@@ -418,7 +419,18 @@
       
 
       
-        
+        <p><img src="http://durow.gitee.io/source/images/2015/1003/201510030000.jpg" alt="MVVM"></p>
+<a id="more"></a>
+<h2 id="0x00-还需要些什么呢"><a href="#0x00-还需要些什么呢" class="headerlink" title="0x00 还需要些什么呢"></a>0x00 还需要些什么呢</h2><p>在前面几篇博客中我们尝试去实现了MVVM中的数据绑定、命令绑定和事件绑定。貌似实现的差不多了。我最早尝试用MVVM去开发的时候也是这么想的，没有用第三方框架，甚至只是实现了数据绑定和命令绑定就开搞了，遇到需要订阅事件的时候就把代码写在后台。那时候经常自我洗脑：设计模式是死的，人是活的，不能犯教条主义错误，后台写点代码影响不大。我确实很好的贯彻了这个思想，逻辑自然是乱得一塌糊涂。后来认真学习了下，实现了事件绑定，感觉好了很多。但确走向了另一个极端，后台代码多写一行都会感觉很不爽。还有就是View和ViewModel的依赖，例如当需要在ViewModel中打开窗口，给窗口传值，在窗口关闭后获取返回值时，打开窗体的动作在ViewModel中进行吗？这样ViewModel又产生了对View的依赖了。还有当主窗体按下一个按钮，然后需要另外一个窗体做出响应的时候，窗体间要如何通信。当在ViewModel中使用其它线程影响到UI时怎么处理。这篇博客主要对这些问题简单说明一下。</p>
+<h2 id="0x01-View和ViewModel的通信"><a href="#0x01-View和ViewModel的通信" class="headerlink" title="0x01 View和ViewModel的通信"></a>0x01 View和ViewModel的通信</h2><p>消息通信的方式主要受到MVVMLight的启发，MVVMLight实现了一套略有复杂的消息通信，包含了定类型发送、分组发送、发送给包含继承类型的目标、广播等。就目前我做的几个小项目来说，View和ViewModel通信本身用的就不是那么频繁，需求也不算旺盛，所以自己实现了一套比较简易的消息通信。View在实例化的时候注册消息，通过一个列表保存注册的消息，消息在发送的时候根据条件从列表中找到相应的消息并执行操作，如下图所示：</p>
+<p><img src="http://durow.gitee.io/source/images/2015/1010/201510100101.png" alt="MVVM5"></p>
+<p>消息发送和处理：</p>
+<p><img src="http://durow.gitee.io/source/images/2015/1010/201510100102.png" alt="MVVM5"></p>
+<p>比较奇怪的是为什么要引入一个消息注册器，在View的后台代码中直接注册不就可以了吗?好吧，其实最初的想法确实比较强迫症，只是单纯的不想在后台中写入太多的代码（我真不是处女座），这样看上去似乎更高端。不过后来想了下，View对ViewModel(虽然不是接口)和消息注册器实际上都算是一种依赖，而且View对ViewModel和消息注册器的依赖都是唯一的，也就是说一个View只有一个ViewModel和一个消息注册器。这样可以用控制反转的方式把对ViewModel和消息注册器的依赖一起注入进来，而且在注入过程中可以顺便配置ViewModel的Dispatcher以方便跨线程修改UI，也可以给ViewModel配置单独的MessageManager让View和ViewModel的通信进入另一个次元，不受其他消息干扰。这些在讨论ViewModel依赖注入的时候将会尝试。</p>
+<h2 id="0x02-关于跨线程修改UI"><a href="#0x02-关于跨线程修改UI" class="headerlink" title="0x02 关于跨线程修改UI"></a>0x02 关于跨线程修改UI</h2><p>这个顺带提一下，因为实现起来很简单。在ViewModel中有时会遇到使用其它线程修改UI的情况，我之前是通过 App.Current.MainWindow.Dispatcher来获取UI线程的调度器的。当然也可以把UI线程的调度器保存到一个静态变量中以便随时访问。不过我一直没搞明白MaiWindow的Dispatcher和非MainWindow的Dispatcher有什么区别，不过还是在ViewModel的基类中加入了Dispatcher这个属性，这样在给View注入ViewModel的时候可以把ViewModel的Dispatcher设置为绑定的View的Dispatcher，虽然并不太清楚这有什么卵用 -_-|||</p>
+<h2 id="0x03-示例"><a href="#0x03-示例" class="headerlink" title="0x03 示例"></a>0x03 示例</h2><p>这个就没有示例了:(</p>
+<p>实际上之前写过一个示例，不过那时候的实现还不太成熟，打算把后面一些想法整合一下，代码重构后再写示例。</p>
+
       
     </div>
     
@@ -578,8 +590,17 @@ var jiathis_config={
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -698,6 +719,22 @@ var jiathis_config={
       </section>
 
       
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x00-还需要些什么呢"><span class="nav-number">1.</span> <span class="nav-text">0x00 还需要些什么呢</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-View和ViewModel的通信"><span class="nav-number">2.</span> <span class="nav-text">0x01 View和ViewModel的通信</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-关于跨线程修改UI"><span class="nav-number">3.</span> <span class="nav-text">0x02 关于跨线程修改UI</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-示例"><span class="nav-number">4.</span> <span class="nav-text">0x03 示例</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
 
       
         <div class="back-to-top">
@@ -732,7 +769,7 @@ var jiathis_config={
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">29.4k</span>
+    <span title="Site words total count">40.3k</span>
   
 </div>
 

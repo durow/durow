@@ -83,18 +83,31 @@
 
 
 
-<meta name="description" content="热爱生活 热爱学习">
 <meta name="keywords" content="C#,配置文件">
 <meta property="og:type" content="article">
 <meta property="og:title" content="C#开发中使用配置文件对象简化配置的本地保存">
 <meta property="og:url" content="http://durow.vip/2015/09/26/C-开发中使用配置文件对象简化配置的本地保存/index.html">
-<meta property="og:site_name" content="Durow&#39;s corner">
-<meta property="og:description" content="热爱生活 热爱学习">
+<meta property="og:site_name" content="Durowの隅">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-03-21T05:06:13.871Z">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0926/201509260000.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0926/201509260101.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0926/201509260102.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0926/201509260103.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0926/201509260104.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0926/201509260105.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0926/201509260106.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0926/201509260107.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0926/201509260108.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0926/201509260109.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0926/201509260110.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0926/201509260111.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0926/201509260301.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0926/201509260302.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0926/201509260303.jpg">
+<meta property="og:updated_time" content="2018-03-23T02:47:28.518Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="C#开发中使用配置文件对象简化配置的本地保存">
-<meta name="twitter:description" content="热爱生活 热爱学习">
+<meta name="twitter:image" content="http://durow.gitee.io/source/images/2015/0926/201509260000.jpg">
 
 
 
@@ -130,7 +143,7 @@
 
 
 
-  <title>C#开发中使用配置文件对象简化配置的本地保存 | Durow's corner</title>
+  <title>C#开发中使用配置文件对象简化配置的本地保存 | Durowの隅</title>
   
 
 
@@ -170,7 +183,7 @@
     <div class="custom-logo-site-title">
       <a href="/"  class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Durow's corner</span>
+        <span class="site-title">Durowの隅</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
@@ -316,7 +329,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Durow's corner">
+      <meta itemprop="name" content="Durowの隅">
     </span>
 
     
@@ -407,7 +420,53 @@
       
 
       
-        
+        <p><img src="http://durow.gitee.io/source/images/2015/0926/201509260000.jpg" alt="Config"></p>
+<a id="more"></a>
+<h2 id="0x00-起因"><a href="#0x00-起因" class="headerlink" title="0x00 起因"></a>0x00 起因</h2><p>程序的核心是数据和逻辑，开发过程中免不了要对操作的数据进行设置，而有些数据在程序执行过程中被用户或程序做出的修改是应该保存下来的，这样程序在下次运行时可以保留上次的一些设置。同样有时我们希望修改某些设置而不需要重新编译程序，这样也可以通过修改本地配置文件达到目的。之前在网上看到过一篇文章，讲的是小程序或测试类的程序应该追求效率，相关配置完全可以硬编码到代码里，无需写到配置文件里。关于什么属于小程序并没有一个明显的界定，至于要不要写到配置文件里这是仁者见仁的问题。我个人还是比较倾向与写到配置文件的。当然，对于脚本语言来说这个问题就小很多了。</p>
+<p>那么如何能快捷方便的保存配置信息呢，这次写的这个类就是尝试去解决这个问题的。主要包括创建和载入配置文件、以键值对的形式保存和读取配置信息。在配置信息的保存方式上可以使用XML或者JSON，我选了XML，一方面是阅读起来比较容易，手动修改也方便，另一方面是.NET本身提供XmlDocument类帮助操作XML文件，这样我们只要在此基础上进行一下包装就可以了。</p>
+<h2 id="0x01-基本功能的实现"><a href="#0x01-基本功能的实现" class="headerlink" title="0x01 基本功能的实现"></a>0x01 基本功能的实现</h2><h3 id="1-配置文件的加载和创建"><a href="#1-配置文件的加载和创建" class="headerlink" title="1.配置文件的加载和创建"></a>1.配置文件的加载和创建</h3><p>public static ConfigFile LoadFile(string filename)</p>
+<p>用用户加载配置文件，如果文件保护存在则返回null</p>
+<p><img src="http://durow.gitee.io/source/images/2015/0926/201509260101.jpg" alt="MVVM"></p>
+<p>public static ConfigFile LoadOrCreateFile(string filename)</p>
+<p>用于加载配置文件，如果文件不存在则创建一个新对象并调用CreateFile()创建配置文件。</p>
+<p><img src="http://durow.gitee.io/source/images/2015/0926/201509260102.jpg" alt="MVVM"></p>
+<p>protected virtual void CreateFile()</p>
+<p>这个是virtual方法，可以根据需求在子类中重写。</p>
+<p><img src="http://durow.gitee.io/source/images/2015/0926/201509260103.jpg" alt="MVVM"></p>
+<h3 id="2-配置信息的保存"><a href="#2-配置信息的保存" class="headerlink" title="2.配置信息的保存"></a>2.配置信息的保存</h3><p>以下方法都是为了简化操作，对AddOrSetKeyValue的包装</p>
+<p><img src="http://durow.gitee.io/source/images/2015/0926/201509260104.jpg" alt="MVVM"></p>
+<p>public void AddOrSetConfigValue(string key, string value)</p>
+<p>可以将键值对保存在Root/Config节点下，key不存在则创建新key，key已存在则更新值。</p>
+<p><img src="http://durow.gitee.io/source/images/2015/0926/201509260105.jpg" alt="MVVM"></p>
+<p>Public void AddOrSetConfigValue<t>(string key, T value)</t></p>
+<p>可以将任意类型存入Root/Config节点下，value调用ToString()方法转为string。</p>
+<p><img src="http://durow.gitee.io/source/images/2015/0926/201509260106.jpg" alt="MVVM"></p>
+<h3 id="3-配置信息的读取"><a href="#3-配置信息的读取" class="headerlink" title="3.配置信息的读取"></a>3.配置信息的读取</h3><p>以下方法都是对GetKeyValue的包装</p>
+<p><img src="http://durow.gitee.io/source/images/2015/0926/201509260107.jpg" alt="MVVM"></p>
+<p>配置以键值对的方式保存，这是个最简单的情况。值的读取都是在Root/Config节点下。</p>
+<p>public string GetConfigValue(string key)</p>
+<p>根据key从固定的XPath中获取值</p>
+<p><img src="http://durow.gitee.io/source/images/2015/0926/201509260108.jpg" alt="MVVM"></p>
+<p>public bool TryParseConfigValue(string key, out result)</p>
+<p>有多个重载，可以根据key取出值并调用相应的TryParse方法进行类型转换，返回false表示转换失败，结果通过result传出。转换失败时result为类型默认值。</p>
+<p><img src="http://durow.gitee.io/source/images/2015/0926/201509260109.jpg" alt="MVVM"></p>
+<p>public XXX GetConfigKeyValueIXXX(string key)</p>
+<p>根据key获取值并转化为XXX类型，转化失败抛出异常。</p>
+<p><img src="http://durow.gitee.io/source/images/2015/0926/201509260110.jpg" alt="MVVM"></p>
+<h3 id="4-使用带参数的属性简化键值操作"><a href="#4-使用带参数的属性简化键值操作" class="headerlink" title="4.使用带参数的属性简化键值操作"></a>4.使用带参数的属性简化键值操作</h3><p>为了能尽量使操作用着方便，对于string类型的值提供了建议的操作方法，可以通过：</p>
+<p>config[“key”]的方式取值，通过config[“key”]=”test”的方式保存。</p>
+<p><img src="http://durow.gitee.io/source/images/2015/0926/201509260111.jpg" alt="MVVM"></p>
+<h2 id="0x02-功能的扩展"><a href="#0x02-功能的扩展" class="headerlink" title="0x02 功能的扩展"></a>0x02 功能的扩展</h2><p>ConfigFile类型只是提供了一个很简单的框架，如果对配置保存有其它需求可以继承该类型并重写CreateFile方法，以在此基础上修改或创建完全不同的配置文件结构。</p>
+<p>对GetKeyValue和AddOrSetKeyValue方法包装可以添加新方法以快速读取和保存配置信息。</p>
+<h2 id="0x03-测试例子"><a href="#0x03-测试例子" class="headerlink" title="0x03 测试例子"></a>0x03 测试例子</h2><p>这个类的使用非常简单，用静态方法创建或载入一个配置文件即可方便的进行读取和保存的操作。</p>
+<p>测试代码：</p>
+<p><img src="http://durow.gitee.io/source/images/2015/0926/201509260301.jpg" alt="MVVM"></p>
+<p>测试结果：</p>
+<p><img src="http://durow.gitee.io/source/images/2015/0926/201509260302.jpg" alt="MVVM"></p>
+<p>保存的配置文件：</p>
+<p><img src="http://durow.gitee.io/source/images/2015/0926/201509260303.jpg" alt="MVVM"></p>
+<h2 id="0x04-相关下载"><a href="#0x04-相关下载" class="headerlink" title="0x04 相关下载"></a>0x04 相关下载</h2><p><a href="https://github.com/durow/TestArea/tree/master/ConfigFileTest" target="_blank" rel="noopener">https://github.com/durow/TestArea/tree/master/ConfigFileTest</a></p>
+
       
     </div>
     
@@ -567,8 +626,17 @@ var jiathis_config={
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -687,6 +755,22 @@ var jiathis_config={
       </section>
 
       
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x00-起因"><span class="nav-number">1.</span> <span class="nav-text">0x00 起因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-基本功能的实现"><span class="nav-number">2.</span> <span class="nav-text">0x01 基本功能的实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-配置文件的加载和创建"><span class="nav-number">2.1.</span> <span class="nav-text">1.配置文件的加载和创建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-配置信息的保存"><span class="nav-number">2.2.</span> <span class="nav-text">2.配置信息的保存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-配置信息的读取"><span class="nav-number">2.3.</span> <span class="nav-text">3.配置信息的读取</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-使用带参数的属性简化键值操作"><span class="nav-number">2.4.</span> <span class="nav-text">4.使用带参数的属性简化键值操作</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-功能的扩展"><span class="nav-number">3.</span> <span class="nav-text">0x02 功能的扩展</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-测试例子"><span class="nav-number">4.</span> <span class="nav-text">0x03 测试例子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x04-相关下载"><span class="nav-number">5.</span> <span class="nav-text">0x04 相关下载</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
 
       
         <div class="back-to-top">
@@ -721,7 +805,7 @@ var jiathis_config={
     
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
-    <span title="Site words total count">29.4k</span>
+    <span title="Site words total count">40.3k</span>
   
 </div>
 
