@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" media="all" href="/lib/Han/dist/han.min.css?v=3.3">
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/logo.jpg?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/logo.jpg?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="MVVM,WPF," />
+
+
+
+
+
+
+
+
+
+
+<meta name="keywords" content="MVVM,WPF">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MVVM模式和在WPF中的实现（二）数据绑定">
+<meta property="og:url" content="http://durow.vip/2015/10/06/WPF/MVVM模式和在WPF中的实现（二）数据绑定/index.html">
+<meta property="og:site_name" content="Durowの隅">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/1003/201510030000.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/1006/201510060101.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/1006/201510060201.png">
+<meta property="og:updated_time" content="2018-03-23T05:52:53.209Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MVVM模式和在WPF中的实现（二）数据绑定">
+<meta name="twitter:image" content="http://durow.gitee.io/source/images/2015/1003/201510030000.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"right","display":"always","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://durow.vip/2015/10/06/WPF/MVVM模式和在WPF中的实现（二）数据绑定/"/>
+
+
+
+
+
+  <title>MVVM模式和在WPF中的实现（二）数据绑定 | Durowの隅</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?b5605a7aa8d230851edcda67de588833";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Durowの隅</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">forever love, forever dream</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/sitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />
+            
+            站点地图
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'jv23s59-xwQTfQjP6xPi','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://durow.vip/2015/10/06/WPF/MVVM模式和在WPF中的实现（二）数据绑定/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="durow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/logo.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Durowの隅">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MVVM模式和在WPF中的实现（二）数据绑定</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2015-10-06T19:09:00+08:00">
+                2015-10-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/WPF/" itemprop="url" rel="index">
+                    <span itemprop="name">WPF</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/WPF/MVVM/" itemprop="url" rel="index">
+                    <span itemprop="name">MVVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2015/10/06/WPF/MVVM模式和在WPF中的实现（二）数据绑定/" class="leancloud_visitors" data-flag-title="MVVM模式和在WPF中的实现（二）数据绑定">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="http://durow.gitee.io/source/images/2015/1003/201510030000.jpg" alt="MVVM"></p>
+<a id="more"></a>
+<h2 id="0x00-数据绑定要达到的效果"><a href="#0x00-数据绑定要达到的效果" class="headerlink" title="0x00 数据绑定要达到的效果"></a>0x00 数据绑定要达到的效果</h2><p>数据绑定要达到什么效果呢，就是在界面中绑定了数据源之后，数据在界面上的修改能反映到绑定源，同时绑定源的修改也能反映到界面上。从界面反映到绑定的数据源是很容易理解的，因为在绑定过程中我们指定了DataContext和Binding的对象，很容易找到绑定的源并修改。但数据源修改时怎么通知界面呢？因为ViewModel中被绑定的属性并不知道谁绑定了它，如果在ViewModel中存一个View的引用，在数据发生变化时修改View，这无疑又将ViewModel和View耦合在了一起，而且这样做View中相应的控件没有开发完善难以进行测试，同样View中控件类型或名称发生改变时，ViewModel中相关代码都需要修改。在WPF中从数据源通知界面发生变化是通过发送通知的方式进行的，你可以想象一个string类型的Property，名字是TestString，在它发生变化时对着View大喊“TestString发生变化了，你们谁绑定了TestString需要跟着变啊！”，至于绑定的是TextBlock的Text，还是Label的Content，还是TextBox的Text，ViewModel并不关心，同样喊了后结果如何ViewModel也不关心。View在收到这个通知后看有没有绑定 了TestString的地方，找到了就修改，找不到就不管了，也不会在乎这个通知是哪个类型的ViewModel发的。这样ViewModel和View就解耦了，谁也不依赖对方。</p>
+<h2 id="0x01-INotifyPropertyChanged接口"><a href="#0x01-INotifyPropertyChanged接口" class="headerlink" title="0x01 INotifyPropertyChanged接口"></a>0x01 INotifyPropertyChanged接口</h2><p>在WPF中能够实现ViewModel向View喊话功能的就是INotifyPropertyChanged接口，它就像一个大喇叭一样，我们实现了这个接口，就可以通过触发PropertyChanged事件并给出改变的数据源的对象和属性名称，以此来通知数据的变化。这个接口的实现是非常简单的，下图代码就是一种非常简易的实现方式。由于在MVVM中所有的ViewModel和部分Model都需要实现这个接口来达到绑定的效果，因此一般会专门用一个类来实现这个接口，并将这个类作为ViewModel等需要数据更改后发送通知的类的基类。</p>
+<p><img src="http://durow.gitee.io/source/images/2015/1006/201510060101.png" alt="MVVM2"></p>
+<h2 id="0x02-ObservableCollection-lt-T-gt-集合"><a href="#0x02-ObservableCollection-lt-T-gt-集合" class="headerlink" title="0x02 ObservableCollection&lt;T&gt;集合"></a>0x02 ObservableCollection&lt;T&gt;集合</h2><p>NotifyObject貌似把一切都解决了，但是考虑这样一种情况，有一个<code>List&lt;string&gt;</code>列表显示人员名单，View中的一个ListBox绑定了这个列表。每次我们添加新成员时，为了能在View中立即看到结果必须调用RaisePropertyChanged方法让ListBox控件重新加载数据源。这种做法执行了大量的无效操作，就像我们只是改变了屏幕上一小部分内容却要刷新整个屏幕以更新显示一样。如果添加的不是人员而是一种添加动作频繁发生的操作，这种无效操作会极大影响性能。因此WPF提供了一个<code>ObservableCollection&lt;T&gt;</code>集合，可以将数据项的添加、删除等反映到View中绑定的控件上而无需我们做任何操作。所以在遇到对集合添加、删除等操作又需要使用数据绑定时要优先考虑<code>ObservalbeCollection&lt;T&gt;</code>。</p>
+<h2 id="0x03-数据绑定的示例"><a href="#0x03-数据绑定的示例" class="headerlink" title="0x03 数据绑定的示例"></a>0x03 数据绑定的示例</h2><p>有了NotifyObject这个基类后，我们就可以测试数据绑定了。为了让示例针对性更强，该示例仅仅用到了数据绑定，未添加命令绑定等其它内容。示例界面如图所示：</p>
+<ol>
+<li><p>拖动滑块时，最上面TextBox中的数值会跟着变化，显示滑块条的当前值，同时主界面背景色的透明度也会跟着变化。</p>
+</li>
+<li><p>左下角的DataGrid和右下角的ListBox以及右边标签为下拉菜单的ComboBox中的数据都是一样的。选中这三个控件中的某行时，其它两个控件也会选中该项。右上方紫色方框内会显示选中行的信息。</p>
+</li>
+<li><p>在左下角DataGrid控件、右下角ListBox控件、右上角紫色区域的某一处修改数据时，其它两处的数据也会随着修改。</p>
+</li>
+</ol>
+<p><img src="http://durow.gitee.io/source/images/2015/1006/201510060201.png" alt="MVVM2"></p>
+<p>下面说明如何通过数据绑定实现上面的功能。</p>
+<p>先说一下主界面的ViewModel，其中有double型属性DoubleValue，TestData型属性<code>SelectedData，List&lt;TestData&gt;</code>型属性TestDataList。这里没有使用ObservableCollection集合因为不涉及到集合内数据项的动态添加和删除。如果要使用ObservableCollection也非常简单，只需要把List<testdata>改为ObservableCollection<testdata>即可。</testdata></testdata></p>
+<ul>
+<li><p>功能1：Slider的Value、TextBox的Text和DockPanel的Background的Opacity都绑定了ViewModel中的DoubleValue。当拖动滑块时，Slider的Value发生了变化，会更新ViewModel中的DoubleValue，DoubleValue更新后会调用RaisePropertyChanged方法触发INotifyPropertyChanged中的PropertyChanged事件，并在事件参数中保存了发生改变的属性名称“DoubleValue”，这样View中绑定了DoubleValue的属性就要更新数据，TextBox的Text属性绑定了DoubleValue，所以TextBox更新了Text以显示最新的Slider的Value。同样主界面最顶层的布局容器DockPanel的Background中的Opacity也绑定了DoubleValue，更改后的表现就是背景色透明度发生了变化。整个过程如图中蓝色箭头所示。</p>
+</li>
+<li><p>功能2：DataGrid、ComboBox、ListBox的ItemsSource都绑定了ViewModel中的TestDataList，所以他们的列表项都是一样的。在DataGrid中我们显示了TestData的所有属性，ComboBox中我们只显示了StringValue属性，在ListBox中则重写了数据项模板，按照我们想要的方式显示TestData中的BoolValue、AddDateTime、和IntValue。同时这三个控件的SelectedItem也都绑定了ViewModel中的SelectedData，因此当其中一个的选中项发生改变时，其它两个控件的选中项也会相应发生改变，原理参照功能1。此外右上角紫色区域的几个TextBox和一个CheckBox分别绑定了SelectedData的不同属性，因此当SelectedData发生改变时，紫色区域内各个控件的显示内容也会发生改变。</p>
+</li>
+<li><p>功能3：因为TestData类也继承自NotifyObject，而且几个属性在发生改变时也会调用RaisePropertyChanged方法发出通知，因此所有绑定了这些属性的控件也会随着更新数据。表现出来就是在任何地方修改了TestData中的属性，所有绑定了这些属性的控件都会更新。</p>
+</li>
+</ul>
+<p>当然了，还需要在主界面的后台代码中把DataContext设置为ViewModel的一个实例。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DataContext = <span class="keyword">new</span> MainWindowViewModel();</span><br></pre></td></tr></table></figure>
+<p>其实上面很多功能可以不借助ViewModel来实现的。例如功能1中把TextBox的Text直接绑定到Slider的Value上，同样功能二中ListBox的SelectedItem也可直接绑定到DataGrid的SelectedItem上，之所以使用ViewModel是为了演示MVVM模式下的数据绑定。</p>
+<h2 id="0x04-相关下载"><a href="#0x04-相关下载" class="headerlink" title="0x04 相关下载"></a>0x04 相关下载</h2><p>示例代码：<a href="https://github.com/durow/TestArea/tree/master/MVVMTest" target="_blank" rel="noopener">https://github.com/durow/TestArea/tree/master/MVVMTest</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>如果觉得有用请打赏一杯咖啡，谢谢 :P</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/WeChatPay.png" alt="durow 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/AliPay.jpg" alt="durow 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+      <div id="bitcoin" style="display: inline-block">
+        <img id="bitcoin_qr" src="/images/BitcoinPay.png" alt="durow 比特币"/>
+        <p>比特币<br>地址:1433nFc4GmHj1gnXdhzA4T944WqSdBajuo</p>
+      </div>
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    durow
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://durow.vip/2015/10/06/WPF/MVVM模式和在WPF中的实现（二）数据绑定/" title="MVVM模式和在WPF中的实现（二）数据绑定">http://durow.vip/2015/10/06/WPF/MVVM模式和在WPF中的实现（二）数据绑定/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/MVVM/" rel="tag"># MVVM</a>
+          
+            <a href="/tags/WPF/" rel="tag"># WPF</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/10/03/WPF/MVVM模式和在WPF中的实现（一）MVVM模式简介/" rel="next" title="MVVM模式和在WPF中的实现（一）MVVM模式简介">
+                <i class="fa fa-chevron-left"></i> MVVM模式和在WPF中的实现（一）MVVM模式简介
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/10/07/WPF/MVVM模式解析和在WPF中的实现（三）命令绑定/" rel="prev" title="MVVM模式解析和在WPF中的实现（三）命令绑定">
+                MVVM模式解析和在WPF中的实现（三）命令绑定 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=2159540" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zNTAyNi8xMTU2Mg=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/logo.jpg"
+                alt="durow" />
+            
+              <p class="site-author-name" itemprop="name">durow</p>
+              <p class="site-description motion-element" itemprop="description">热爱生活 热爱学习</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">51</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.qq.com" target="_blank" title="16141860">
+                      
+                        <i class="fa fa-fw fa-qq"></i>16141860</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:durow@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/durow" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/durow" target="_blank" title="Weibo">
+                      
+                        <i class="fa fa-fw fa-weibo"></i>Weibo</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/13399420/" target="_blank" title="Bilibili">
+                      
+                        <i class="fa fa-fw fa-tv"></i>Bilibili</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.twitter.com/durow1984" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-heart"></i>
+                好站推荐
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://cnblogs.com/" title="博客园" target="_blank">博客园</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x00-数据绑定要达到的效果"><span class="nav-number">1.</span> <span class="nav-text">0x00 数据绑定要达到的效果</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-INotifyPropertyChanged接口"><span class="nav-number">2.</span> <span class="nav-text">0x01 INotifyPropertyChanged接口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-ObservableCollection-lt-T-gt-集合"><span class="nav-number">3.</span> <span class="nav-text">0x02 ObservableCollection&lt;T&gt;集合</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-数据绑定的示例"><span class="nav-number">4.</span> <span class="nav-text">0x03 数据绑定的示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x04-相关下载"><span class="nav-number">5.</span> <span class="nav-text">0x04 相关下载</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">durow</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">44.2k</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+  <div class="footer-custom">Hosted by <a target="_blank" href="https://coding.net/pages" style="font-weight:bold">Coding Pages</a></div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("Ai37u86U95uCssl57jjMliaH-gzGzoHsz", "QeIwQbw9Ndwl2sh4uawjySJJ");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "default";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "middleRight";
+      
+          pbOptions.networks = "Wechat,Weibo,Douban,QQZone,Evernote,Twitter";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" media="all" href="/lib/Han/dist/han.min.css?v=3.3">
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/logo.jpg?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/logo.jpg?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="C#,并发,性能测试," />
+
+
+
+
+
+
+
+
+
+
+<meta name="keywords" content="C#,并发,性能测试">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C#中实现并发的几种方法的性能测试">
+<meta property="og:url" content="http://durow.vip/2015/09/25/CS/C-中实现并发的几种方法的性能测试/index.html">
+<meta property="og:site_name" content="Durowの隅">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0925/201509250000.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0925/201509250101.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0925/201509250201.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0925/201509250301.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0925/201509250401.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0925/201509250501.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0925/201509250601.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0925/201509250701.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0925/201509250702.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0925/201509250703.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0925/201509250704.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0925/201509250705.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0925/201509250706.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/0925/201509250707.png">
+<meta property="og:updated_time" content="2018-03-23T05:52:41.700Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="C#中实现并发的几种方法的性能测试">
+<meta name="twitter:image" content="http://durow.gitee.io/source/images/2015/0925/201509250000.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"right","display":"always","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://durow.vip/2015/09/25/CS/C-中实现并发的几种方法的性能测试/"/>
+
+
+
+
+
+  <title>C#中实现并发的几种方法的性能测试 | Durowの隅</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?b5605a7aa8d230851edcda67de588833";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Durowの隅</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">forever love, forever dream</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/sitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />
+            
+            站点地图
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'jv23s59-xwQTfQjP6xPi','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://durow.vip/2015/09/25/CS/C-中实现并发的几种方法的性能测试/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="durow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/logo.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Durowの隅">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">C#中实现并发的几种方法的性能测试</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2015-09-25T11:47:00+08:00">
+                2015-09-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C/" itemprop="url" rel="index">
+                    <span itemprop="name">C#</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2015/09/25/CS/C-中实现并发的几种方法的性能测试/" class="leancloud_visitors" data-flag-title="C#中实现并发的几种方法的性能测试">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="http://durow.gitee.io/source/images/2015/0925/201509250000.jpg" alt="Concurrence"></p>
+<a id="more"></a>
+<h2 id="0x00-起因"><a href="#0x00-起因" class="headerlink" title="0x00 起因"></a>0x00 起因</h2><p>去年写的一个程序因为需要在局域网发送消息支持一些命令和简单数据的传输，所以写了一个C/S的通信模块。当时的做法很简单，服务端等待链接，有用户接入后开启一个线程，在线程中运行一个while循环接收数据，接收到数据就处理。用户退出（收到QUIT命令）后线程结束。程序一直运行正常（当然还要处理“TCP粘包”、消息格式封装等问题，在此不作讨论），不过随着使用的人越来越多，而且考虑到线程开销比较大，如果有100个用户链接那么服务端就要多创建100个线程，500个用户就是500个线程，确实太夸张了(当然实际并没有那么多用户)。由于TCP通信并不是每时每刻都在进行着的，因此可以把所有客户端连接存储到一个列表中，通过轮询的方式依次开启一个线程进行数据接收，接收完毕后释放线程，这样可以充分利用线程池，避免大量线程消耗内存和CPU。</p>
+<p>轮询的方式通过线程池实现了线程的复用，可以肯定的是在资源开销上肯定是小很多的，但轮询的方式在单位时间内的处理次数会不会比保持线程的方式少很多呢，本测试将解决这个疑问。</p>
+<h2 id="0x01-实验方法"><a href="#0x01-实验方法" class="headerlink" title="0x01 实验方法"></a>0x01 实验方法</h2><p>IDE：VS2015</p>
+<p>.Net Framework 4.5</p>
+<p>接收数据的对象如下所示</p>
+<p><img src="http://durow.gitee.io/source/images/2015/0925/201509250101.jpg" alt="Concurrence"></p>
+<p>通过ReceiveData方法接收数据，每次接收只有1%的可能性收到数据，通过创建N个对象接收数据来模拟一个TCP服务端处理N个连接的情况。毕竟TCP通信不是随时进行的，当然这个百分比可以调整。程序输出的内容包括每秒执行了多少次接收操作，接收到数据的线程编号和接收到的内容等。</p>
+<p>0x02 保持线程的并发<br>保持线程的并发非常直观，就是每建立一个对象就开一个新线程循环进行ReceiveData操作，当接收到数据就把相关信息输出到主界面上。代码如下所示：</p>
+<p><img src="http://durow.gitee.io/source/images/2015/0925/201509250201.jpg" alt="Concurrence"></p>
+<h2 id="0x03-使用ThreadPool轮询并发"><a href="#0x03-使用ThreadPool轮询并发" class="headerlink" title="0x03 使用ThreadPool轮询并发"></a>0x03 使用ThreadPool轮询并发</h2><p>方法是使用一个List（或其他容器）把所有的对象放进去，创建一个线程（为了防止UI假死，由于这个线程创建后会一直执行切运算密集，所以使用TheadPool和Thread差别不大），在这个线程中使用foreach(或for)循环依次对每个对象执行ReceiveData方法，每次执行的时候创建一个线程池线程来执行。代码如下：</p>
+<p><img src="http://durow.gitee.io/source/images/2015/0925/201509250301.jpg" alt="Concurrence"></p>
+<h2 id="0x04使用Task轮询并发"><a href="#0x04使用Task轮询并发" class="headerlink" title="0x04使用Task轮询并发"></a>0x04使用Task轮询并发</h2><p>方法与ThreadPool类似，只是每次创建线程池线程执行ReceiveData方法时是通过Task创建的线程。代码如下所示：</p>
+<p><img src="http://durow.gitee.io/source/images/2015/0925/201509250401.jpg" alt="Concurrence"></p>
+<h2 id="0x05-使用await轮询并发"><a href="#0x05-使用await轮询并发" class="headerlink" title="0x05 使用await轮询并发"></a>0x05 使用await轮询并发</h2><p>方法与ThreadPool类似，只是每次创建线程池线程执行ReceiveData方法时是通过await等待操作。代码如下：</p>
+<p>刚开始在foreach中写了await导致线程阻塞，但因为ReceiveData()中测试时为了尽量拉开差距没有让线程睡眠以模拟线程操作，导致没有意识到这个问题，多谢 @逸风之狐 提醒。</p>
+<p>修改后代码如下所示，这样测试方法就可以立即返回了。不过async/await确实不是用来干这个的。</p>
+<p><img src="http://durow.gitee.io/source/images/2015/0925/201509250501.png" alt="Concurrence"></p>
+<h2 id="0x06-使用Parallel并发"><a href="#0x06-使用Parallel并发" class="headerlink" title="0x06 使用Parallel并发"></a>0x06 使用Parallel并发</h2><p>这是FCL提供的一种方法，Parallel.ForEach中每次方法都是异步执行，执行采用的是线程池线程。代码如下所示：</p>
+<p><img src="http://durow.gitee.io/source/images/2015/0925/201509250601.jpg" alt="Concurrence"></p>
+<h2 id="0x07-测试结果"><a href="#0x07-测试结果" class="headerlink" title="0x07 测试结果"></a>0x07 测试结果</h2><p>创建500个对象来模拟500个连接的情况。其中测试结果中的每秒接收次数会有个波动范围，主要参照百位以上。使用线程池线程的几个方法（ThreadPool、Task、await、Parallel）中程序的线程数略有差别，可能跟执行环境有关，难以表明实质性差异。其中await因为线程切换导致线程执行时间略长，使得线程池需要多创建一些线程。</p>
+<h3 id="1、保持线程的并发"><a href="#1、保持线程的并发" class="headerlink" title="1、保持线程的并发"></a>1、保持线程的并发</h3><p><img src="http://durow.gitee.io/source/images/2015/0925/201509250701.jpg" alt="Concurrence"></p>
+<p>平均每秒接收8654次数据。在任务开始后会创建500个线程，由于每个线程都需要单独的栈空间来执行，内存消耗较大。频繁切换线程也会加重CPU的负担。</p>
+<h3 id="2、ThreadPool轮询并发"><a href="#2、ThreadPool轮询并发" class="headerlink" title="2、ThreadPool轮询并发"></a>2、ThreadPool轮询并发</h3><p><img src="http://durow.gitee.io/source/images/2015/0925/201509250702.jpg" alt="Concurrence"></p>
+<p>平均每秒接受9529次数据。由于实现了线程池线程的复用，无需创建太多线程，内存没有出现波动，CPU消耗也比较均匀。</p>
+<h3 id="3、Task轮询并发"><a href="#3、Task轮询并发" class="headerlink" title="3、Task轮询并发"></a>3、Task轮询并发</h3><p><img src="http://durow.gitee.io/source/images/2015/0925/201509250703.jpg" alt="Concurrence"></p>
+<p>平均每秒接收9322次数据，由于Task也是基于线程池的封装，因此与ThreadPool结果差别不大。</p>
+<h3 id="、await轮询并发"><a href="#、await轮询并发" class="headerlink" title="、await轮询并发"></a>、await轮询并发</h3><p><img src="http://durow.gitee.io/source/images/2015/0925/201509250704.jpg" alt="Concurrence"></p>
+<p>平均每秒接收4150次。await也是使用线程池线程，所以在内存开销和线程数上与其他使用线程池线程的方法没有太大差别。但await在等待完毕后会将执行上下文从线程池线程切换回调用线程，因此CPU开销较大。</p>
+<h3 id="5、Parallel并发"><a href="#5、Parallel并发" class="headerlink" title="5、Parallel并发"></a>5、Parallel并发</h3><p><img src="http://durow.gitee.io/source/images/2015/0925/201509250705.jpg" alt="Concurrence"></p>
+<p>看名字就知道这个设计出来就是应用于这种使用环境的，平均每秒接收9387次数据，也是使用线程池线程，所以内存和CPU消耗与ThreadPool和Task差不多。但不需要自己写foreach(for)循环，只要写循环体即可。</p>
+<h3 id="6、补充测试"><a href="#6、补充测试" class="headerlink" title="6、补充测试"></a>6、补充测试</h3><p>经测试随着ReceiveData()耗时不断增加，轮询方式的优势越来越小。表现就是刚开始线程执行效率很低，需要花费时间慢慢赶上去。因为线程池中的初始线程不够用，需要创建更多的线程池线程，线程池线程创建起来没有Thread那么快，不过当线程池中的线程数量逐渐满足需求之后，轮询的优势就又体现出来了。</p>
+<ul>
+<li>测试1：测试同样500个线程，有1%的可能接收到数据，但收到数据时模拟执行操作耗时100毫秒，程序刚开始效率很低，花了大概12秒左右，当线程数增长到54个时基本稳定可以满足需求，效率也越来越高。</li>
+</ul>
+<p><img src="http://durow.gitee.io/source/images/2015/0925/201509250706.png" alt="Concurrence"></p>
+<ul>
+<li>测试2：测试同样500个线程，有1%的可能接收到数据，但收到数据时模拟执行操作耗时500毫秒，程序刚开始效率同样很低，花了大概150秒左右，当线程数增长到97个时基本稳定可以满足需求，效率也越来越高。</li>
+</ul>
+<p><img src="http://durow.gitee.io/source/images/2015/0925/201509250707.png" alt="Concurrence"></p>
+<h2 id="0x08-结论"><a href="#0x08-结论" class="headerlink" title="0x08 结论"></a>0x08 结论</h2><p>首先明显能看出来的是使用轮询的方式比保持线程能节省很多资源，特别是内存。而且在处理效率上轮询的方式（每秒接收9300-9500次）比保持线程还要高（每秒8600+）。因此在这种并发模型下应该使用轮询的方式以节省资源并提高并发效率。</p>
+<p>实际上硬拿await来比较是不太公平的，await被设计出来就不是应用于这种场景的。不管是之前关于异步的测试还是并发的测试，基于线程池的方案相差都不大。因此思路对了的情况下使用ThreadPool总是没错的。但有些类型把ThreadPool包装了以更好适应某些特殊场景，因此有了Task、await、Parallel等。而在这次的测试条件下显然Parallel是最合适的，与直接使用ThreadPool相比资源开销和执行效率一样，但代码更少。</p>
+<p>在补充测试中也能看到，不同的运行环境对运行效率的影响还是很大的，因此还是要针对自己的环境做针对性更强的测试以采用更合适的方法。例如在我的使用环境中，服务端TCP消息的转发和部分命令的处理耗时都是非常短的。同样假设最高同时在线500个用户，这500个用户也不会是同事登陆的，所以也不会存在线程池初始线程严重不够用的情况。随着用户慢慢登陆，线程池线程根据需求慢慢增加，这样创建线程池线程增加的耗时就不那么明显了。所以在我的使用环境下轮询的方式无疑是合适的。因此刚开始对ReceiveData()只设置了接受数据的概率，没有模拟延迟。大家有需求的可以把测试程序下下来根据实际情况调整最大并发数、接收到数据的概率和接收数据的耗时以进行测试。</p>
+<h2 id="0x09-相关下载"><a href="#0x09-相关下载" class="headerlink" title="0x09 相关下载"></a>0x09 相关下载</h2><p>测试代码下载链接：<a href="https://github.com/durow/TestArea/tree/master/AsyncTest/ConcurrenceTest" target="_blank" rel="noopener">https://github.com/durow/TestArea/tree/master/AsyncTest/ConcurrenceTest</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>如果觉得有用请打赏一杯咖啡，谢谢 :P</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/WeChatPay.png" alt="durow 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/AliPay.jpg" alt="durow 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+      <div id="bitcoin" style="display: inline-block">
+        <img id="bitcoin_qr" src="/images/BitcoinPay.png" alt="durow 比特币"/>
+        <p>比特币<br>地址:1433nFc4GmHj1gnXdhzA4T944WqSdBajuo</p>
+      </div>
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    durow
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://durow.vip/2015/09/25/CS/C-中实现并发的几种方法的性能测试/" title="C#中实现并发的几种方法的性能测试">http://durow.vip/2015/09/25/CS/C-中实现并发的几种方法的性能测试/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C#</a>
+          
+            <a href="/tags/并发/" rel="tag"># 并发</a>
+          
+            <a href="/tags/性能测试/" rel="tag"># 性能测试</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/09/21/CS/C-执行异步操作的几种方式比较和总结/" rel="next" title="C#执行异步操作的几种方式比较和总结">
+                <i class="fa fa-chevron-left"></i> C#执行异步操作的几种方式比较和总结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/09/26/CS/C-开发中使用配置文件对象简化配置的本地保存/" rel="prev" title="C#开发中使用配置文件对象简化配置的本地保存">
+                C#开发中使用配置文件对象简化配置的本地保存 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=2159540" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zNTAyNi8xMTU2Mg=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/logo.jpg"
+                alt="durow" />
+            
+              <p class="site-author-name" itemprop="name">durow</p>
+              <p class="site-description motion-element" itemprop="description">热爱生活 热爱学习</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">51</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.qq.com" target="_blank" title="16141860">
+                      
+                        <i class="fa fa-fw fa-qq"></i>16141860</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:durow@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/durow" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/durow" target="_blank" title="Weibo">
+                      
+                        <i class="fa fa-fw fa-weibo"></i>Weibo</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/13399420/" target="_blank" title="Bilibili">
+                      
+                        <i class="fa fa-fw fa-tv"></i>Bilibili</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.twitter.com/durow1984" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-heart"></i>
+                好站推荐
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://cnblogs.com/" title="博客园" target="_blank">博客园</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x00-起因"><span class="nav-number">1.</span> <span class="nav-text">0x00 起因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-实验方法"><span class="nav-number">2.</span> <span class="nav-text">0x01 实验方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-使用ThreadPool轮询并发"><span class="nav-number">3.</span> <span class="nav-text">0x03 使用ThreadPool轮询并发</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x04使用Task轮询并发"><span class="nav-number">4.</span> <span class="nav-text">0x04使用Task轮询并发</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x05-使用await轮询并发"><span class="nav-number">5.</span> <span class="nav-text">0x05 使用await轮询并发</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x06-使用Parallel并发"><span class="nav-number">6.</span> <span class="nav-text">0x06 使用Parallel并发</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x07-测试结果"><span class="nav-number">7.</span> <span class="nav-text">0x07 测试结果</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、保持线程的并发"><span class="nav-number">7.1.</span> <span class="nav-text">1、保持线程的并发</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、ThreadPool轮询并发"><span class="nav-number">7.2.</span> <span class="nav-text">2、ThreadPool轮询并发</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3、Task轮询并发"><span class="nav-number">7.3.</span> <span class="nav-text">3、Task轮询并发</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#、await轮询并发"><span class="nav-number">7.4.</span> <span class="nav-text">、await轮询并发</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5、Parallel并发"><span class="nav-number">7.5.</span> <span class="nav-text">5、Parallel并发</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6、补充测试"><span class="nav-number">7.6.</span> <span class="nav-text">6、补充测试</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x08-结论"><span class="nav-number">8.</span> <span class="nav-text">0x08 结论</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x09-相关下载"><span class="nav-number">9.</span> <span class="nav-text">0x09 相关下载</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">durow</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">44.2k</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+  <div class="footer-custom">Hosted by <a target="_blank" href="https://coding.net/pages" style="font-weight:bold">Coding Pages</a></div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("Ai37u86U95uCssl57jjMliaH-gzGzoHsz", "QeIwQbw9Ndwl2sh4uawjySJJ");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "default";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "middleRight";
+      
+          pbOptions.networks = "Wechat,Weibo,Douban,QQZone,Evernote,Twitter";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

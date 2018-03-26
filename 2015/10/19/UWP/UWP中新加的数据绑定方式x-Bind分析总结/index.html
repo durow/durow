@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" media="all" href="/lib/Han/dist/han.min.css?v=3.3">
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/logo.jpg?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/logo.jpg?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="UWP,WindowsPhone," />
+
+
+
+
+
+
+
+
+
+
+<meta name="keywords" content="UWP,WindowsPhone">
+<meta property="og:type" content="article">
+<meta property="og:title" content="UWP中新加的数据绑定方式x:Bind分析总结">
+<meta property="og:url" content="http://durow.vip/2015/10/19/UWP/UWP中新加的数据绑定方式x-Bind分析总结/index.html">
+<meta property="og:site_name" content="Durowの隅">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/1019/201510190000.jpg">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/1019/201510190201.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/1019/201510190202.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/1019/201510190203.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/1019/201510190204.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/1019/201510190205.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/1019/201510190206.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/1019/201510190207.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/1019/201510190208.png">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2015/1019/201510190209.png">
+<meta property="og:updated_time" content="2018-03-23T05:53:10.779Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="UWP中新加的数据绑定方式x:Bind分析总结">
+<meta name="twitter:image" content="http://durow.gitee.io/source/images/2015/1019/201510190000.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"right","display":"always","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://durow.vip/2015/10/19/UWP/UWP中新加的数据绑定方式x-Bind分析总结/"/>
+
+
+
+
+
+  <title>UWP中新加的数据绑定方式x:Bind分析总结 | Durowの隅</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?b5605a7aa8d230851edcda67de588833";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Durowの隅</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">forever love, forever dream</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/sitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />
+            
+            站点地图
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'jv23s59-xwQTfQjP6xPi','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://durow.vip/2015/10/19/UWP/UWP中新加的数据绑定方式x-Bind分析总结/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="durow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/logo.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Durowの隅">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">UWP中新加的数据绑定方式x:Bind分析总结</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2015-10-19T21:44:00+08:00">
+                2015-10-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/UWP/" itemprop="url" rel="index">
+                    <span itemprop="name">UWP</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2015/10/19/UWP/UWP中新加的数据绑定方式x-Bind分析总结/" class="leancloud_visitors" data-flag-title="UWP中新加的数据绑定方式x:Bind分析总结">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="http://durow.gitee.io/source/images/2015/1019/201510190000.jpg" alt="xBind"></p>
+<a id="more"></a>
+<h2 id="0x00-UWP中的x-Bind"><a href="#0x00-UWP中的x-Bind" class="headerlink" title="0x00 UWP中的x:Bind"></a>0x00 UWP中的x:Bind</h2><p>由之前有过WPF开发经验，所以在学习UWP的时候直接省略了XAML、数据绑定等几个看着十分眼熟的主题。学习过程中倒是也没遇到麻烦。直到在园子里看到了这篇文章：</p>
+<p><a href="http://www.cnblogs.com/gaoshang212/p/4534138.html" target="_blank" rel="noopener">http://www.cnblogs.com/gaoshang212/p/4534138.html</a></p>
+<p>原来UWP的绑定中新加了个x:Bind，从文章中可以看到x:Bind的效率是很高的。找到MSDN（数据绑定）看了一下（完整的学习目录可参见: <a href="http://www.cnblogs.com/durow/p/4878822.html" target="_blank" rel="noopener">http://www.cnblogs.com/durow/p/4878822.html</a>），然后试着写了几个测试程序，对x:Bind也算有所了解了，下面写一下自己的心得体会。</p>
+<h2 id="0x01-为什么要搞出个x-Bind"><a href="#0x01-为什么要搞出个x-Bind" class="headerlink" title="0x01 为什么要搞出个x:Bind"></a>0x01 为什么要搞出个x:Bind</h2><p>这个问题还是比较容易回答的，因为x:Bind的效率高。毕竟UWP覆盖了手机端，而手机一方面硬件的性能有限，另一方面电池电量也有限，因此节约性能开销有着很大的意义。x:Bind为什么能节约开销呢，因为x:Bind的数据绑定发生在编译时，也就是说在编译的时候View中绑定的什么数据，数据是什么类型的就已经清楚了，绑定工作在编译时即可完成。因此需要我们在后台代码中指定一个类型明确的ViewModel，这样在View中使用x:Bind绑定ViewModel中的数据，一切都是类型明确的。而Binding是在程序运行时才能确定数据源的，属于动态绑定，效率自然不如x:Bind。但从设计上来看，x:Bind使View和ViewModel之间的耦合更紧了，因为必须给View指定一个类型明确的ViewModel。使用x:Bind算是牺牲设计换效率吧，是一种折中的方式。当然如果不喜欢x:Bind也不在乎那点性能，Binding也是可以正常使用的。</p>
+<h2 id="0x02-x-Bind的使用方法"><a href="#0x02-x-Bind的使用方法" class="headerlink" title="0x02 x:Bind的使用方法"></a>0x02 x:Bind的使用方法</h2><h3 id="1-绑定属性"><a href="#1-绑定属性" class="headerlink" title="1.绑定属性"></a>1.绑定属性</h3><p>首先说明一下测试用的Model：</p>
+<p><img src="http://durow.gitee.io/source/images/2015/1019/201510190201.png" alt="xBind"></p>
+<p>X:Bind和Binding在绑定属性上的区别就是x:Bind在绑定时需要加上ViewModel实例的名称，例如后台代码中创建实例VM</p>
+<p><img src="http://durow.gitee.io/source/images/2015/1019/201510190202.png" alt="xBind"></p>
+<p>在View中就需要这样绑定：</p>
+<p><img src="http://durow.gitee.io/source/images/2015/1019/201510190203.png" alt="xBind"></p>
+<p>需要注意的是x:Bind默认的绑定方式是OneTime，即只绑定一次，在使用时记得根据需求改成OneWay或TwoWay。</p>
+<p>此外还需要说明的是，x:Bind的绑定是强类型的，如果遇到绑定源为Object（例如绑定ListView的SelectedItem）需要进行强制类型转换。如下图所示，其中local为TestData所在命名空间。</p>
+<p><img src="http://durow.gitee.io/source/images/2015/1019/201510190204.png" alt="xBind"></p>
+<h3 id="2-绑定命令和事件"><a href="#2-绑定命令和事件" class="headerlink" title="2.绑定命令和事件"></a>2.绑定命令和事件</h3><p>绑定命令和属性绑定类似，需要写明ViewModel的实例。在ViewModel中有命令CmdTest如下所示：</p>
+<p><img src="http://durow.gitee.io/source/images/2015/1019/201510190205.png" alt="xBind"></p>
+<p>在View中就可以这样绑定：</p>
+<p><img src="http://durow.gitee.io/source/images/2015/1019/201510190206.png" alt="xBind"></p>
+<p>此外很重要的一点就是x:Bind支持绑定事件，看到这个一口老血喷到屏幕上。在WPF中又是引用第三方dll又是写EventToCommand，就是为了绑定个事件传递个事件参数（MVVM设计模式和WPF中的实现（四）事件绑定），如果说刚接触UWP时看到InvokeCommandAction可以传递事件参数还可以用激动来形容的话，看到x:Bind的事件绑定只能是吐血了。我们可以像以前那样把事件绑定到命令，绑定方式可以是Binding也可以是x:Bind，除此之外可以直接使用x:Bind把事件绑定到ViewModel的一个方法上，这个方法可以是无参数的也可以是符合EventHandler签名的。</p>
+<p>例如在ViewModel中有两个方法Loaded和Moved：</p>
+<p><img src="http://durow.gitee.io/source/images/2015/1019/201510190207.png" alt="xBind"></p>
+<p>在View中可以把事件绑定到这两个方法上：</p>
+<p><img src="http://durow.gitee.io/source/images/2015/1019/201510190208.png" alt="xBind"></p>
+<p>运行起来就像这样:</p>
+<p><img src="http://durow.gitee.io/source/images/2015/1019/201510190209.png" alt="xBind"></p>
+<h2 id="0x03-Binding的优势"><a href="#0x03-Binding的优势" class="headerlink" title="0x03 Binding的优势"></a>0x03 Binding的优势</h2><p>x:Bind提供了一种效率优先的绑定方式，但在有些情况下还是需要用Binding来处理的。除了动态绑定外，目前我能想到的就是Binding的UpdateSourceTrigger，可以指定更新数据源的方式。例如在TextBox的Text发生改变时马上更新数据源，这个x:Bind应该是做不到的吧。还有就是在设计时把DataContext写在XAML里，使用Binding可以在设计时看到数据。随着使用增多，应该还会发现更多的需要使用Binding的情况吧。</p>
+<h2 id="0x04-写在最后"><a href="#0x04-写在最后" class="headerlink" title="0x04 写在最后"></a>0x04 写在最后</h2><p>x:Bind基本解决了数据/命令/事件绑定的常用场景，对于由此而导致的View和ViewModel的相对紧一点的耦合，我个人是完全可以接受的。因此我个人的原则就是能使用x:Bind的情况下优先使用x:Bind，x:Bind满足不了需求了再使用Binding。</p>
+<p>然后再回过头来看看之前写的UWP下的MVVM框架，简直图样。相信随着后面的学习还会不断产生这种感觉;)</p>
+<p>最后要说的就是学东西要踏实，不能一味求快，看过的概念再看一遍，温故知新也是好的，何况里面还有新东西。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>如果觉得有用请打赏一杯咖啡，谢谢 :P</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/WeChatPay.png" alt="durow 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/AliPay.jpg" alt="durow 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+      <div id="bitcoin" style="display: inline-block">
+        <img id="bitcoin_qr" src="/images/BitcoinPay.png" alt="durow 比特币"/>
+        <p>比特币<br>地址:1433nFc4GmHj1gnXdhzA4T944WqSdBajuo</p>
+      </div>
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    durow
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://durow.vip/2015/10/19/UWP/UWP中新加的数据绑定方式x-Bind分析总结/" title="UWP中新加的数据绑定方式x:Bind分析总结">http://durow.vip/2015/10/19/UWP/UWP中新加的数据绑定方式x-Bind分析总结/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/UWP/" rel="tag"># UWP</a>
+          
+            <a href="/tags/WindowsPhone/" rel="tag"># WindowsPhone</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/10/15/WPF/MVVM框架从WPF移植到UWP遇到的问题和解决方法/" rel="next" title="MVVM框架从WPF移植到UWP遇到的问题和解决方法">
+                <i class="fa fa-chevron-left"></i> MVVM框架从WPF移植到UWP遇到的问题和解决方法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/10/21/UWP/UWP中实现自定义标题栏/" rel="prev" title="UWP中实现自定义标题栏">
+                UWP中实现自定义标题栏 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=2159540" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zNTAyNi8xMTU2Mg=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/logo.jpg"
+                alt="durow" />
+            
+              <p class="site-author-name" itemprop="name">durow</p>
+              <p class="site-description motion-element" itemprop="description">热爱生活 热爱学习</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">51</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.qq.com" target="_blank" title="16141860">
+                      
+                        <i class="fa fa-fw fa-qq"></i>16141860</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:durow@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/durow" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/durow" target="_blank" title="Weibo">
+                      
+                        <i class="fa fa-fw fa-weibo"></i>Weibo</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/13399420/" target="_blank" title="Bilibili">
+                      
+                        <i class="fa fa-fw fa-tv"></i>Bilibili</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.twitter.com/durow1984" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-heart"></i>
+                好站推荐
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://cnblogs.com/" title="博客园" target="_blank">博客园</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x00-UWP中的x-Bind"><span class="nav-number">1.</span> <span class="nav-text">0x00 UWP中的x:Bind</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-为什么要搞出个x-Bind"><span class="nav-number">2.</span> <span class="nav-text">0x01 为什么要搞出个x:Bind</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-x-Bind的使用方法"><span class="nav-number">3.</span> <span class="nav-text">0x02 x:Bind的使用方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-绑定属性"><span class="nav-number">3.1.</span> <span class="nav-text">1.绑定属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-绑定命令和事件"><span class="nav-number">3.2.</span> <span class="nav-text">2.绑定命令和事件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-Binding的优势"><span class="nav-number">4.</span> <span class="nav-text">0x03 Binding的优势</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x04-写在最后"><span class="nav-number">5.</span> <span class="nav-text">0x04 写在最后</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">durow</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">44.2k</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+  <div class="footer-custom">Hosted by <a target="_blank" href="https://coding.net/pages" style="font-weight:bold">Coding Pages</a></div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("Ai37u86U95uCssl57jjMliaH-gzGzoHsz", "QeIwQbw9Ndwl2sh4uawjySJJ");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "default";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "middleRight";
+      
+          pbOptions.networks = "Wechat,Weibo,Douban,QQZone,Evernote,Twitter";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

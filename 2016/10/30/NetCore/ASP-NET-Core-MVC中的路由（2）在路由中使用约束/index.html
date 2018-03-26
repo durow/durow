@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" media="all" href="/lib/Han/dist/han.min.css?v=3.3">
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/logo.jpg?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/logo.jpg?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="ASP.NET Core,MVC,路由,.NET Core," />
+
+
+
+
+
+
+
+
+
+
+<meta name="keywords" content="ASP.NET Core,MVC,路由,.NET Core">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ASP.NET Core MVC中的路由（2）在路由中使用约束">
+<meta property="og:url" content="http://durow.vip/2016/10/30/NetCore/ASP-NET-Core-MVC中的路由（2）在路由中使用约束/index.html">
+<meta property="og:site_name" content="Durowの隅">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://durow.gitee.io/source/images/2016/1030/201610300000.png">
+<meta property="og:updated_time" content="2018-03-23T05:52:35.823Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ASP.NET Core MVC中的路由（2）在路由中使用约束">
+<meta name="twitter:image" content="http://durow.gitee.io/source/images/2016/1030/201610300000.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"right","display":"always","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://durow.vip/2016/10/30/NetCore/ASP-NET-Core-MVC中的路由（2）在路由中使用约束/"/>
+
+
+
+
+
+  <title>ASP.NET Core MVC中的路由（2）在路由中使用约束 | Durowの隅</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?b5605a7aa8d230851edcda67de588833";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Durowの隅</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">forever love, forever dream</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/sitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />
+            
+            站点地图
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="st-search-show-outputs">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'jv23s59-xwQTfQjP6xPi','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://durow.vip/2016/10/30/NetCore/ASP-NET-Core-MVC中的路由（2）在路由中使用约束/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="durow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/logo.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Durowの隅">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ASP.NET Core MVC中的路由（2）在路由中使用约束</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-10-30T12:27:00+08:00">
+                2016-10-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/NET-Core/" itemprop="url" rel="index">
+                    <span itemprop="name">.NET Core</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/NET-Core/MVC/" itemprop="url" rel="index">
+                    <span itemprop="name">MVC</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2016/10/30/NetCore/ASP-NET-Core-MVC中的路由（2）在路由中使用约束/" class="leancloud_visitors" data-flag-title="ASP.NET Core MVC中的路由（2）在路由中使用约束">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="http://durow.gitee.io/source/images/2016/1030/201610300000.png" alt="ASP.NET"></p>
+<a id="more"></a>
+<h2 id="0x00-路由模板中的约束"><a href="#0x00-路由模板中的约束" class="headerlink" title="0x00 路由模板中的约束"></a>0x00 路由模板中的约束</h2><p>在配置路由模板时，除了以静态字符和变量的形式外，还可以通过配置对变量进行约束。实际如果不嫌麻烦的话在路由到的Action中对变量进行检查也是一种方法，不过对于变量的通用的约束当然是放在路由层面更加合适。而且这样做会简化Action的代码，使Action更加专注于自身业务，符合AOP的思路。这篇文章主要介绍路由模板中的约束。</p>
+<h2 id="0x01-在路由模板中使用约束"><a href="#0x01-在路由模板中使用约束" class="headerlink" title="0x01 在路由模板中使用约束"></a>0x01 在路由模板中使用约束</h2><p>在路由模板中使用约束是很简单的，如下所示：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;controller=Home&#125;/&#123;action=Index&#125;/&#123;id:<span class="keyword">int</span>?&#125;</span><br></pre></td></tr></table></figure>
+<p>这个模板就对id进行了约束，约束是通过冒号（:）实现的，冒号后为约束的内容。Int?代表id约束为int?类型，只有id能被转换为int?类型模板匹配才算成功。即使用int.TryParse()方法返回true。</p>
+<ul>
+<li>Home/Index/123匹配成功，id为123</li>
+<li>Home/Index/abc 匹配失败，因为abc无法转换为int?</li>
+<li>Home/Index匹配成功，此时id为null</li>
+</ul>
+<p>和配置默认值一样，除了直接在模板中配置外，也可以在MapRoute方法中通过传入参数进行配置：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">routes.MapRoute(</span><br><span class="line">    name: <span class="string">"default"</span>,</span><br><span class="line">    template: <span class="string">"&#123;controller&#125;/&#123;action&#125;/&#123;id?&#125;"</span>,</span><br><span class="line">    defaults: <span class="keyword">new</span></span><br><span class="line">    &#123;</span><br><span class="line">        controller = <span class="string">"Home"</span>,</span><br><span class="line">        action = <span class="string">"Index"</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    constraints: <span class="keyword">new</span></span><br><span class="line">    &#123;</span><br><span class="line">        id = <span class="keyword">new</span> IntRouteConstraint()</span><br><span class="line">&#125;);</span><br><span class="line">``` CS</span><br><span class="line"></span><br><span class="line">效果是一样的。如果我们要对一个变量使用多个约束，只需要在约束后面继续用冒号加约束即可。例如</span><br><span class="line"></span><br><span class="line">``` CS</span><br><span class="line">&#123;controller=Home&#125;/&#123;action=Index&#125;/&#123;id:<span class="keyword">int</span>:min(<span class="number">0</span>)&#125;</span><br></pre></td></tr></table></figure>
+<p>这个模板中id被约束为int类型且最小值为0。同样的也可以以参数的方式配置：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">routes.MapRoute(</span><br><span class="line">    name: <span class="string">"default"</span>,</span><br><span class="line">    template: <span class="string">"&#123;controller&#125;/&#123;action&#125;/&#123;id?&#125;"</span>,</span><br><span class="line">    defaults: <span class="keyword">new</span></span><br><span class="line">    &#123;</span><br><span class="line">        controller = <span class="string">"Home"</span>,</span><br><span class="line">        action = <span class="string">"Index"</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    constraints: <span class="keyword">new</span></span><br><span class="line">    &#123;</span><br><span class="line">        id = <span class="keyword">new</span> CompositeRouteConstraint(</span><br><span class="line">            <span class="keyword">new</span> IRouteConstraint[]</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">new</span> IntRouteConstraint(),</span><br><span class="line">                <span class="keyword">new</span> MinRouteConstraint(<span class="number">0</span>)</span><br><span class="line">            &#125;)</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>可以达到同样的效果，不过直接写到模板更加简洁和直观。</p>
+<h2 id="0x02-NetCore-MVC中内建的约束"><a href="#0x02-NetCore-MVC中内建的约束" class="headerlink" title="0x02 .NetCore MVC中内建的约束"></a>0x02 .NetCore MVC中内建的约束</h2><p>.NetCore MVC中内建了大量的约束可供使用。其中大多数基于类型的约束都是使用该类型的TryParse()来尝试转换变量提取出来的字符串，返回ture则通过约束，返回false违反约束。</p>
+<h4 id="1-约束为int：int，对应的类为IntRouteConstraint"><a href="#1-约束为int：int，对应的类为IntRouteConstraint" class="headerlink" title="1.约束为int：int，对应的类为IntRouteConstraint"></a>1.约束为int：int，对应的类为IntRouteConstraint</h4><p>例子：<code>{controller=Home}/{action=Index}/{id:int }</code></p>
+<h4 id="2-约束为float：float，对应的类为FloatRouteConstraint"><a href="#2-约束为float：float，对应的类为FloatRouteConstraint" class="headerlink" title="2.约束为float：float，对应的类为FloatRouteConstraint"></a>2.约束为float：float，对应的类为FloatRouteConstraint</h4><p>例子：<code>{controller=Home}/{action=Index}/{id:float }</code></p>
+<h4 id="3-约束为long：long，对应的类为LongRouteConstraint"><a href="#3-约束为long：long，对应的类为LongRouteConstraint" class="headerlink" title="3.约束为long：long，对应的类为LongRouteConstraint"></a>3.约束为long：long，对应的类为LongRouteConstraint</h4><p>例子：<code>{controller=Home}/{action=Index}/{id:long}</code></p>
+<h4 id="4-约束为double：double，对应的类为DoubleRouteConstraint"><a href="#4-约束为double：double，对应的类为DoubleRouteConstraint" class="headerlink" title="4.约束为double：double，对应的类为DoubleRouteConstraint"></a>4.约束为double：double，对应的类为DoubleRouteConstraint</h4><p>例子：<code>{controller=Home}/{action=Index}/{id:double }</code></p>
+<h4 id="5-约束为decimal：decimal，对应的类为DecimalRouteConstraint"><a href="#5-约束为decimal：decimal，对应的类为DecimalRouteConstraint" class="headerlink" title="5.约束为decimal：decimal，对应的类为DecimalRouteConstraint"></a>5.约束为decimal：decimal，对应的类为DecimalRouteConstraint</h4><p>例子：<code>{controller=Home}/{action=Index}/{id:decimal }</code></p>
+<h4 id="6-约束为布尔值：bool，对应的类为BoolRouteConstraint"><a href="#6-约束为布尔值：bool，对应的类为BoolRouteConstraint" class="headerlink" title="6.约束为布尔值：bool，对应的类为BoolRouteConstraint"></a>6.约束为布尔值：bool，对应的类为BoolRouteConstraint</h4><p>例子：<code>{controller=Home}/{action=Index}/{id:bool}</code></p>
+<h4 id="7-约束为字母：alpha，对应的类为AlphaRouteConstraint"><a href="#7-约束为字母：alpha，对应的类为AlphaRouteConstraint" class="headerlink" title="7.约束为字母：alpha，对应的类为AlphaRouteConstraint"></a>7.约束为字母：alpha，对应的类为AlphaRouteConstraint</h4><p>例子：<code>{controller=Home}/{action=Index}/{id:alpha}</code></p>
+<h4 id="8-约束为时间日期：datetime，对应的类为DateTimeRouteConstraint"><a href="#8-约束为时间日期：datetime，对应的类为DateTimeRouteConstraint" class="headerlink" title="8.约束为时间日期：datetime，对应的类为DateTimeRouteConstraint"></a>8.约束为时间日期：datetime，对应的类为DateTimeRouteConstraint</h4><p>例子：<code>{controller=Home}/{action=Index}/{id:datetime}</code></p>
+<h4 id="9-约束为GUID：guid，对应的类为GuidRouteConstraint"><a href="#9-约束为GUID：guid，对应的类为GuidRouteConstraint" class="headerlink" title="9.约束为GUID：guid，对应的类为GuidRouteConstraint"></a>9.约束为GUID：guid，对应的类为GuidRouteConstraint</h4><p>例子：<code>{controller=Home}/{action=Index}/{id:bool}</code></p>
+<h4 id="10-约束长度：length-len-，对应的类为LengthRouteConstraint-len"><a href="#10-约束长度：length-len-，对应的类为LengthRouteConstraint-len" class="headerlink" title="10.约束长度：length(len)，对应的类为LengthRouteConstraint(len)"></a>10.约束长度：length(len)，对应的类为LengthRouteConstraint(len)</h4><p>例子：<code>{controller=Home}/{action=Index}/{id:length(5) }</code></p>
+<h4 id="11-约束最小长度：minlength-len-，对应的类为MinLengthRouteConstraint-len"><a href="#11-约束最小长度：minlength-len-，对应的类为MinLengthRouteConstraint-len" class="headerlink" title="11.约束最小长度：minlength(len)，对应的类为MinLengthRouteConstraint(len)"></a>11.约束最小长度：minlength(len)，对应的类为MinLengthRouteConstraint(len)</h4><p>例子：<code>{controller=Home}/{action=Index}/{id:minlength(5)}</code></p>
+<h4 id="12-约束最大长度：maxlength-len-，对应的类为MaxLengthRouteConstraint-len"><a href="#12-约束最大长度：maxlength-len-，对应的类为MaxLengthRouteConstraint-len" class="headerlink" title="12.约束最大长度：maxlength(len)，对应的类为MaxLengthRouteConstraint(len)"></a>12.约束最大长度：maxlength(len)，对应的类为MaxLengthRouteConstraint(len)</h4><p>例子：<code>{controller=Home}/{action=Index}/{id:maxlength(10)}</code></p>
+<h4 id="13-约束长度范围：length-min-max-，对应的类为LengthRouteConstraint-min-max"><a href="#13-约束长度范围：length-min-max-，对应的类为LengthRouteConstraint-min-max" class="headerlink" title="13.约束长度范围：length(min,max)，对应的类为LengthRouteConstraint(min,max)"></a>13.约束长度范围：length(min,max)，对应的类为LengthRouteConstraint(min,max)</h4><p>例子：<code>{controller=Home}/{action=Index}/{id:length(5,10)}</code></p>
+<h4 id="14-约束最小值：min-v-，对应的类为MinRouteConstraint-v"><a href="#14-约束最小值：min-v-，对应的类为MinRouteConstraint-v" class="headerlink" title="14.约束最小值：min(v)，对应的类为MinRouteConstraint(v)"></a>14.约束最小值：min(v)，对应的类为MinRouteConstraint(v)</h4><p>例子：<code>{controller=Home}/{action=Index}/{id:min(0)}</code></p>
+<h4 id="15-约束最大值：max-v-，对应的类为MaxRouteConstraint-v"><a href="#15-约束最大值：max-v-，对应的类为MaxRouteConstraint-v" class="headerlink" title="15.约束最大值：max(v)，对应的类为MaxRouteConstraint(v)"></a>15.约束最大值：max(v)，对应的类为MaxRouteConstraint(v)</h4><p>例子：<code>{controller=Home}/{action=Index}/{id:max(1000)}</code></p>
+<h4 id="16-约束范围：range-min-max-，对应的类为RangeRouteConstraint-min-max"><a href="#16-约束范围：range-min-max-，对应的类为RangeRouteConstraint-min-max" class="headerlink" title="16.约束范围：range(min,max)，对应的类为RangeRouteConstraint(min,max)"></a>16.约束范围：range(min,max)，对应的类为RangeRouteConstraint(min,max)</h4><p>例子：<code>{controller=Home}/{action=Index}/{id:range(0,1000) }</code></p>
+<h4 id="17-约束正则表达式：regex-exp-，对应的类为RegexRouteConstraint-exp"><a href="#17-约束正则表达式：regex-exp-，对应的类为RegexRouteConstraint-exp" class="headerlink" title="17.约束正则表达式：regex(exp)，对应的类为RegexRouteConstraint(exp)"></a>17.约束正则表达式：regex(exp)，对应的类为RegexRouteConstraint(exp)</h4><p>例子：<code>{controller:regex(^My.*)=Home }/{action=Index}/{id?}</code></p>
+<h2 id="0x03-创建自定义约束"><a href="#0x03-创建自定义约束" class="headerlink" title="0x03 创建自定义约束"></a>0x03 创建自定义约束</h2><p>除了使用内建的约束外，还可以自定义约束。只要实现IRouteConstraint接口即可。这个接口定义了一个方法：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">Match</span>(<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">    HttpContext httpContext,   //Http上下文信息</span></span></span><br><span class="line"><span class="function"><span class="params">    IRouter route,            //当前正在测试的模板信息</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">string</span> routeKey,           //当前正在测试约束的变量名称</span></span></span><br><span class="line"><span class="function"><span class="params">    RouteValueDictionary values, //模板中变量提取出的值</span></span></span><br><span class="line"><span class="function"><span class="params">    RouteDirection routeDirection</span>) <span class="comment">//路由方向，枚举，值包括IncominRequestg和UrlGeneration</span></span></span><br></pre></td></tr></table></figure>
+<p>这个方法返回ture说明符合约束，返回false说明违反约束。下面我们通过实现这个接口定义一个约束，把id约束为偶数。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">EvenRouteConstraint</span> : <span class="title">IRouteConstraint</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">bool</span> <span class="title">Match</span>(<span class="params">HttpContext httpContext, IRouter route, <span class="keyword">string</span> routeKey, RouteValueDictionary values, RouteDirection routeDirection</span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> id;</span><br><span class="line">        <span class="keyword">if</span> (!<span class="keyword">int</span>.TryParse(values[routeKey].ToString(), <span class="keyword">out</span> id))</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">            </span><br><span class="line">        <span class="keyword">return</span> id % <span class="number">2</span> == <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后这样配置路由来约束id：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">routes.MapRoute(</span><br><span class="line">    name: <span class="string">"default"</span>,</span><br><span class="line">    template: <span class="string">"&#123;controller&#125;/&#123;action&#125;/&#123;id?&#125;"</span>,</span><br><span class="line">    defaults: <span class="keyword">new</span></span><br><span class="line">    &#123;</span><br><span class="line">        controller = <span class="string">"Home"</span>,</span><br><span class="line">        action = <span class="string">"Index"</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    constraints: <span class="keyword">new</span></span><br><span class="line">    &#123;</span><br><span class="line">        id = <span class="keyword">new</span> EvenRouteConstraint()</span><br><span class="line">    &#125;);</span><br></pre></td></tr></table></figure>
+<p>这样配置后</p>
+<ul>
+<li>空Path路由到HomeController的Index，id为空</li>
+<li>Home/Index/12路由到HomeController的Index，id为12，是偶数</li>
+<li>Home/Index/13匹配失败，id为13，不是偶数。</li>
+</ul>
+<p>除了使用constraints参数添加自定义路由约束外，也可以把自定义路由约束映射为字符串，用于路由模板中。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ConfigureServices</span>(<span class="params">IServiceCollection services</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">        services.Configure&lt;RouteOptions&gt;(options=&gt;</span><br><span class="line">        &#123;</span><br><span class="line">            options.ConstraintMap.Add(<span class="string">"even"</span>,<span class="keyword">typeof</span>(EvenRouteConstraint));</span><br><span class="line">        &#125;);</span><br><span class="line">        <span class="comment">// Add framework services.</span></span><br><span class="line">        services.AddMvc();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样配置后路由模板写成：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">routes.MapRoute(</span><br><span class="line">    name: <span class="string">"default"</span>,</span><br><span class="line">    template: <span class="string">"&#123;controller=Home&#125;/&#123;action=Index&#125;/&#123;id:even?&#125;"</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>可以达到同样的效果。把约束映射为字符串后，还可以方便的在Route特性中使用，例如：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[<span class="meta">Route(<span class="meta-string">"durow/Test/[action]/&#123;id:even?&#125;"</span>)</span>]</span><br></pre></td></tr></table></figure>
+<h2 id="0x04-相关代码"><a href="#0x04-相关代码" class="headerlink" title="0x04 相关代码"></a>0x04 相关代码</h2><p><a href="https://github.com/durow/NetCoreStudy/tree/master/src/RouteStudy" target="_blank" rel="noopener">https://github.com/durow/NetCoreStudy/tree/master/src/RouteStudy</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>如果觉得有用请打赏一杯咖啡，谢谢 :P</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/WeChatPay.png" alt="durow 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/AliPay.jpg" alt="durow 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+      <div id="bitcoin" style="display: inline-block">
+        <img id="bitcoin_qr" src="/images/BitcoinPay.png" alt="durow 比特币"/>
+        <p>比特币<br>地址:1433nFc4GmHj1gnXdhzA4T944WqSdBajuo</p>
+      </div>
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    durow
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://durow.vip/2016/10/30/NetCore/ASP-NET-Core-MVC中的路由（2）在路由中使用约束/" title="ASP.NET Core MVC中的路由（2）在路由中使用约束">http://durow.vip/2016/10/30/NetCore/ASP-NET-Core-MVC中的路由（2）在路由中使用约束/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ASP-NET-Core/" rel="tag"># ASP.NET Core</a>
+          
+            <a href="/tags/MVC/" rel="tag"># MVC</a>
+          
+            <a href="/tags/路由/" rel="tag"># 路由</a>
+          
+            <a href="/tags/NET-Core/" rel="tag"># .NET Core</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div id="needsharebutton-postbottom">
+            <span class="btn">
+              <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </span>
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/24/NetCore/ASP-NET-Core-MVC中的路由（1）路由配置基础/" rel="next" title="ASP.NET Core MVC中的路由（1）路由配置基础">
+                <i class="fa fa-chevron-left"></i> ASP.NET Core MVC中的路由（1）路由配置基础
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/11/30/NetCore/在ASP-NET-Core中使用百度在线编辑器UEditor/" rel="prev" title="在ASP.NET Core中使用百度在线编辑器UEditor">
+                在ASP.NET Core中使用百度在线编辑器UEditor <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微博</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=2159540" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zNTAyNi8xMTU2Mg=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/logo.jpg"
+                alt="durow" />
+            
+              <p class="site-author-name" itemprop="name">durow</p>
+              <p class="site-description motion-element" itemprop="description">热爱生活 热爱学习</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">51</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.qq.com" target="_blank" title="16141860">
+                      
+                        <i class="fa fa-fw fa-qq"></i>16141860</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:durow@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/durow" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/durow" target="_blank" title="Weibo">
+                      
+                        <i class="fa fa-fw fa-weibo"></i>Weibo</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/13399420/" target="_blank" title="Bilibili">
+                      
+                        <i class="fa fa-fw fa-tv"></i>Bilibili</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.twitter.com/durow1984" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-heart"></i>
+                好站推荐
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://cnblogs.com/" title="博客园" target="_blank">博客园</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x00-路由模板中的约束"><span class="nav-number">1.</span> <span class="nav-text">0x00 路由模板中的约束</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-在路由模板中使用约束"><span class="nav-number">2.</span> <span class="nav-text">0x01 在路由模板中使用约束</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-NetCore-MVC中内建的约束"><span class="nav-number">3.</span> <span class="nav-text">0x02 .NetCore MVC中内建的约束</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-约束为int：int，对应的类为IntRouteConstraint"><span class="nav-number">3.0.1.</span> <span class="nav-text">1.约束为int：int，对应的类为IntRouteConstraint</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-约束为float：float，对应的类为FloatRouteConstraint"><span class="nav-number">3.0.2.</span> <span class="nav-text">2.约束为float：float，对应的类为FloatRouteConstraint</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-约束为long：long，对应的类为LongRouteConstraint"><span class="nav-number">3.0.3.</span> <span class="nav-text">3.约束为long：long，对应的类为LongRouteConstraint</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-约束为double：double，对应的类为DoubleRouteConstraint"><span class="nav-number">3.0.4.</span> <span class="nav-text">4.约束为double：double，对应的类为DoubleRouteConstraint</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-约束为decimal：decimal，对应的类为DecimalRouteConstraint"><span class="nav-number">3.0.5.</span> <span class="nav-text">5.约束为decimal：decimal，对应的类为DecimalRouteConstraint</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-约束为布尔值：bool，对应的类为BoolRouteConstraint"><span class="nav-number">3.0.6.</span> <span class="nav-text">6.约束为布尔值：bool，对应的类为BoolRouteConstraint</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7-约束为字母：alpha，对应的类为AlphaRouteConstraint"><span class="nav-number">3.0.7.</span> <span class="nav-text">7.约束为字母：alpha，对应的类为AlphaRouteConstraint</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#8-约束为时间日期：datetime，对应的类为DateTimeRouteConstraint"><span class="nav-number">3.0.8.</span> <span class="nav-text">8.约束为时间日期：datetime，对应的类为DateTimeRouteConstraint</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#9-约束为GUID：guid，对应的类为GuidRouteConstraint"><span class="nav-number">3.0.9.</span> <span class="nav-text">9.约束为GUID：guid，对应的类为GuidRouteConstraint</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#10-约束长度：length-len-，对应的类为LengthRouteConstraint-len"><span class="nav-number">3.0.10.</span> <span class="nav-text">10.约束长度：length(len)，对应的类为LengthRouteConstraint(len)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#11-约束最小长度：minlength-len-，对应的类为MinLengthRouteConstraint-len"><span class="nav-number">3.0.11.</span> <span class="nav-text">11.约束最小长度：minlength(len)，对应的类为MinLengthRouteConstraint(len)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#12-约束最大长度：maxlength-len-，对应的类为MaxLengthRouteConstraint-len"><span class="nav-number">3.0.12.</span> <span class="nav-text">12.约束最大长度：maxlength(len)，对应的类为MaxLengthRouteConstraint(len)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#13-约束长度范围：length-min-max-，对应的类为LengthRouteConstraint-min-max"><span class="nav-number">3.0.13.</span> <span class="nav-text">13.约束长度范围：length(min,max)，对应的类为LengthRouteConstraint(min,max)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#14-约束最小值：min-v-，对应的类为MinRouteConstraint-v"><span class="nav-number">3.0.14.</span> <span class="nav-text">14.约束最小值：min(v)，对应的类为MinRouteConstraint(v)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#15-约束最大值：max-v-，对应的类为MaxRouteConstraint-v"><span class="nav-number">3.0.15.</span> <span class="nav-text">15.约束最大值：max(v)，对应的类为MaxRouteConstraint(v)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#16-约束范围：range-min-max-，对应的类为RangeRouteConstraint-min-max"><span class="nav-number">3.0.16.</span> <span class="nav-text">16.约束范围：range(min,max)，对应的类为RangeRouteConstraint(min,max)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#17-约束正则表达式：regex-exp-，对应的类为RegexRouteConstraint-exp"><span class="nav-number">3.0.17.</span> <span class="nav-text">17.约束正则表达式：regex(exp)，对应的类为RegexRouteConstraint(exp)</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x03-创建自定义约束"><span class="nav-number">4.</span> <span class="nav-text">0x03 创建自定义约束</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x04-相关代码"><span class="nav-number">5.</span> <span class="nav-text">0x04 相关代码</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">durow</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">44.2k</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+  <div class="footer-custom">Hosted by <a target="_blank" href="https://coding.net/pages" style="font-weight:bold">Coding Pages</a></div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("Ai37u86U95uCssl57jjMliaH-gzGzoHsz", "QeIwQbw9Ndwl2sh4uawjySJJ");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "default";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "middleRight";
+      
+          pbOptions.networks = "Wechat,Weibo,Douban,QQZone,Evernote,Twitter";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
